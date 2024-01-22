@@ -1,5 +1,5 @@
 package az.projectdailyreport.projectdailyreport.model;
-public enum UserRole {
+public enum RoleName {
     ROLE_SUPERADMIN("SuperAdmin"),
     ROLE_ADMIN("Admin"),
     ROLE_HEAD("Head"),
@@ -7,7 +7,7 @@ public enum UserRole {
 
     private final String displayName;
 
-    UserRole(String displayName) {
+    RoleName(String displayName) {
         this.displayName = displayName;
     }
 

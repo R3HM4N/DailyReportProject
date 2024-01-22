@@ -19,14 +19,6 @@ public class RoleController {
     private final RoleService roleService;
 
 
-
-    @PostMapping("/create")
-    public ResponseEntity<Role> createRole(@RequestBody RoleDto roleDto) {
-        Role createdRole = roleService.createRole(roleDto);
-        return new ResponseEntity<>(createdRole, HttpStatus.CREATED);
-    }
-
-
     @GetMapping
     public List<Role> getAllRoles() {
         return roleService.getAllRoles();
