@@ -25,4 +25,7 @@ public class DailyReport {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name = "project_id")
+    private Project project;
 }

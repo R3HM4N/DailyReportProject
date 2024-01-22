@@ -24,7 +24,9 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
-    private String status; // "active" veya "deactivated"
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     @CrocusoftEmail
     @Email(message = "Geçerli bir e-posta adresi değil")

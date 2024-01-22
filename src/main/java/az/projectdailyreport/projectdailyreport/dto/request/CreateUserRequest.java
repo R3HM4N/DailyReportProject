@@ -3,6 +3,7 @@ import az.projectdailyreport.projectdailyreport.model.Project;
 import az.projectdailyreport.projectdailyreport.model.Role;
 import az.projectdailyreport.projectdailyreport.model.Team;
 import az.projectdailyreport.projectdailyreport.validation.CrocusoftEmail;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -29,7 +30,6 @@ public class CreateUserRequest {
     @NotNull(message = "Rol belirtilmelidir")
     private Role role;
 
-    private String status;
 
     @CrocusoftEmail
     @Email(message = "Geçerli bir e-posta adresi değil")
@@ -41,13 +41,12 @@ public class CreateUserRequest {
     private Set<Project> projects;
 
 
-    public CreateUserRequest(String userName, String firstName, String lastName, String password, Role role, String status, String mail, Team team, Set<Project> projects) {
+    public CreateUserRequest(String userName, String firstName, String lastName, String password, Role role, String mail, Team team, Set<Project> projects) {
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
         this.role = role;
-        this.status = status;
         this.mail = mail;
         this.team = team;
         this.projects = projects;

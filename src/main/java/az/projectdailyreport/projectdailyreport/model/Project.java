@@ -14,10 +14,12 @@ public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     private String projectName;
-
-    @ManyToMany(mappedBy = "projects")
-    private Set<User> users = new HashSet<>();
+//
+//    @ManyToMany(mappedBy = "projects")
+//    private Set<User> users = new HashSet<>();
 
 }

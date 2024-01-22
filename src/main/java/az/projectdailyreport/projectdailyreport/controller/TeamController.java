@@ -19,7 +19,7 @@ public class TeamController {
 
 
 
-    @GetMapping
+    @GetMapping("/get")
     public List<Team> getAllTeams() {
         return teamService.getAllTeams();
     }
@@ -31,16 +31,24 @@ public class TeamController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<Team> createTeam(@RequestBody TeamDto teamDto) {
         Team createdTeam = teamService.createTeam(teamDto);
         return new ResponseEntity<>(createdTeam, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTeam(@PathVariable Long id) {
+    public ResponseEntity<String> deleteTeam(@PathVariable Long id) {
         teamService.deleteTeam(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok("Team successfully HARD Delete edildi.");
+    }
+
+    @DeleteMapping("/soft/{id}")
+    public ResponseEntity<String> softDeleteTeam(@PathVariable Long id) {
+
+            teamService.softDeleteTeam(id);
+            return ResponseEntity.ok("Team successfully SOFT Delete edildi.");
+
     }
 }
 

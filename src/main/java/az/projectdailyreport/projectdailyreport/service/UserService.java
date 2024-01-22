@@ -5,5 +5,9 @@ import az.projectdailyreport.projectdailyreport.model.User;
 
 public interface UserService {
     User createUser(CreateUserRequest createUserRequest);
+    void softDeleteUser(Long userId);
+    void hardDeleteUser(Long userId);
+
+
 }
 
