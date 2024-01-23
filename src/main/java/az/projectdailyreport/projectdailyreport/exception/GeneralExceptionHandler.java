@@ -1,6 +1,4 @@
 package az.projectdailyreport.projectdailyreport.exception;
-
-import jakarta.persistence.EntityExistsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -103,4 +101,13 @@ public class GeneralExceptionHandler {
                 exception.getMessage());
     }
 
+    @ExceptionHandler(DuplicateReportException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionResponse handleDuplicateReportException(DuplicateReportException exception) {
+        return new ExceptionResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage());
+    }
 }

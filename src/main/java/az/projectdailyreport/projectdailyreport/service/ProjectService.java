@@ -10,8 +10,10 @@ public interface ProjectService {
 
     Project createProject(ProjectDto projectDto);
     List<Project> getAllProject();
+    Project getProjectById(Long projectId);
+     List<Project> getProjectByIds(List <Long> projectId);
 
     void softDeleteProject(Long id);
 
-    void hardDeleteProject(Long id);
+//    void hardDeleteProject(Long id);
 }

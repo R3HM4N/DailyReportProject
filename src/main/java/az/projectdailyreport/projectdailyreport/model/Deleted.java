@@ -1,6 +1,6 @@
 package az.projectdailyreport.projectdailyreport.model;
-public enum Status {
-    ACTIVE,
 
-    INACTIVE
+public enum Deleted {
+    ACTIVE,
+    DELETED
 }

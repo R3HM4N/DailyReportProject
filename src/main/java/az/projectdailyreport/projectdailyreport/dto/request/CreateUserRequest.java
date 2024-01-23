@@ -1,4 +1,5 @@
 package az.projectdailyreport.projectdailyreport.dto.request;
+import az.projectdailyreport.projectdailyreport.dto.TeamDto;
 import az.projectdailyreport.projectdailyreport.model.Project;
 import az.projectdailyreport.projectdailyreport.model.Role;
 import az.projectdailyreport.projectdailyreport.model.Team;
@@ -9,6 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.List;
 import java.util.Set;
 
 
@@ -38,19 +40,18 @@ public class CreateUserRequest {
     @NotNull(message = "Takım belirtilmelidir")
     private Team team;
 
-    private Set<Project> projects;
+    private List<Long> projectIds;
 
 
-    public CreateUserRequest(String userName, String firstName, String lastName, String password, Role role, String mail, Team team, Set<Project> projects) {
-        this.userName = userName;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.password = password;
-        this.role = role;
-        this.mail = mail;
-        this.team = team;
-        this.projects = projects;
-    }
+//    public CreateUserRequest(String userName, String firstName, String lastName, String password, Role role,     String mail, Team team, Set<Project> projects) {
+//        this.userName = userName;
+//        this.firstName = firstName;
+//        this.lastName = lastName;
+//        this.password = password;
+//        this.role = role;
+//        this.mail = mail;
+//        this.projects = projects;
+//    }
     // Getter ve setter metotları
 }
 

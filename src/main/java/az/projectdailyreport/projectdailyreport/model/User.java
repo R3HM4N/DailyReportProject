@@ -36,13 +36,15 @@ public class User {
     @JoinColumn(name = "team_id")  // Bu alan, User'ın hangi Team'e ait olduğunu belirtir
     private Team team;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_projects",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "project_id")
     )
     private Set<Project> projects = new HashSet<>();
+
+
     @OneToMany(mappedBy = "user")
     private Set<DailyReport> dailyReports;
 
@@ -50,5 +52,4 @@ public class User {
         this.userName = userName;
     }
 
-    // Getter ve setter metotları
 }

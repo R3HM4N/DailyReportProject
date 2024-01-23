@@ -11,6 +11,6 @@ public interface TeamService {
     List<Team> getAllTeams();
     Optional<Team> getTeamById(Long id);
     Team createTeam(TeamDto teamDto);
-    void deleteTeam(Long id);
-    void softDeleteTeam(Long id);
+//    void deleteTeam(Long id);
+//    void softDeleteTeam(Long id);
 }

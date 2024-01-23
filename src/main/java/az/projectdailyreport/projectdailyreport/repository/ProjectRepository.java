@@ -1,5 +1,6 @@
 package az.projectdailyreport.projectdailyreport.repository;
 
+import az.projectdailyreport.projectdailyreport.model.Deleted;
 import az.projectdailyreport.projectdailyreport.model.Project;
 import az.projectdailyreport.projectdailyreport.model.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,10 +9,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ProjectRepository extends JpaRepository<Project,Long> {
     boolean existsByProjectName(String projectName);
-    boolean existsByIdAndStatus(Long id, Status status);
+    boolean existsByIdAndStatus(Long id, Deleted deleted);
+    Optional<Project> findById(Long projectId);
+
 
     @Modifying
     @Query("UPDATE Project p SET p.status = 'DELETED' WHERE p.id = :id")

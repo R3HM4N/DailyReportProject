@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 @RequiredArgsConstructor
 public class RoleDataLoader implements CommandLineRunner {
@@ -24,6 +26,10 @@ public class RoleDataLoader implements CommandLineRunner {
                 roleRepository.save(role);
             }
         }
+    }
+    public static void main(String[] args) {
+        LocalDateTime now = LocalDateTime.now();
+        System.out.println(now);
     }
 }
 

@@ -46,25 +46,25 @@ public class TeamServiceImpl implements TeamService {
         return teamRepository.save(team);
     }
 
-    @Override
-    public void deleteTeam(Long id) {
-        teamRepository.findById(id)
-                .orElseThrow(() -> new TeamNotFoundException(id));
+//    @Override
+//    public void deleteTeam(Long id) {
+//        teamRepository.findById(id)
+//                .orElseThrow(() -> new TeamNotFoundException(id));
+//
+//        teamRepository.deleteById(id);
+//    }
 
-        teamRepository.deleteById(id);
-    }
-
-    @Override
-    @Transactional
-    public void softDeleteTeam(Long id) {
-        Team team = teamRepository.findById(id)
-                .orElseThrow(() -> new TeamNotFoundException(id));
-
-        if (team.getStatus() == Status.DELETED) {
-            throw new TeamAlreadyDeletedException(id);
-        }
-
-        teamRepository.softDeleteTeam(id);
-    }
+//    @Override
+//    @Transactional
+//    public void softDeleteTeam(Long id) {
+//        Team team = teamRepository.findById(id)
+//                .orElseThrow(() -> new TeamNotFoundException(id));
+//
+//        if (team.getStatus() == Status.DELETED) {
+//            throw new TeamAlreadyDeletedException(id);
+//        }
+//
+//        teamRepository.softDeleteTeam(id);
+//    }
 
 }

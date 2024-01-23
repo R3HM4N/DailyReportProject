@@ -4,6 +4,7 @@ import az.projectdailyreport.projectdailyreport.dto.ProjectDto;
 import az.projectdailyreport.projectdailyreport.exception.ProjectAlreadyDeletedException;
 import az.projectdailyreport.projectdailyreport.exception.ProjectExistsException;
 import az.projectdailyreport.projectdailyreport.exception.ProjectNotFoundException;
+import az.projectdailyreport.projectdailyreport.model.Deleted;
 import az.projectdailyreport.projectdailyreport.model.Project;
 import az.projectdailyreport.projectdailyreport.model.Status;
 import az.projectdailyreport.projectdailyreport.repository.ProjectRepository;
@@ -39,30 +40,38 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepository.findAll();
     }
 
+    public List<Project> getProjectByIds(List <Long> projectId) {
+        return projectRepository.findAllById(projectId);
+    }
     @Override
     @Transactional
     public void softDeleteProject(Long id) {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new ProjectNotFoundException(id));
 
-        if (Status.DELETED.equals(project.getStatus())) {
+        if (Deleted.DELETED.equals(project.getStatus())) {
             throw new ProjectAlreadyDeletedException(id);
         }
 
         // Yeniden soft delete denemesini kontrol et
-        if (projectRepository.existsByIdAndStatus(id, Status.DELETED)) {
+        if (projectRepository.existsByIdAndStatus(id, Deleted.DELETED)) {
             throw new ProjectAlreadyDeletedException(id);
         }
 
         projectRepository.softDeleteProject(id);
     }
 
-    @Override
-    public void hardDeleteProject(Long id) {
-        Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new ProjectNotFoundException(id));
-
-
-        projectRepository.deleteById(id);
+    public Project getProjectById(Long projectId) {
+        return projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
     }
+
+//    @Override
+//    public void hardDeleteProject(Long id) {
+//        Project project = projectRepository.findById(id)
+//                .orElseThrow(() -> new ProjectNotFoundException(id));
+//
+//
+//        projectRepository.deleteById(id);
+//    }
 }

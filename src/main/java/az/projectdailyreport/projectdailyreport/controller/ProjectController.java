@@ -36,11 +36,11 @@ public class ProjectController {
     }
 
     // Hard Delete
-    @DeleteMapping("/hard/{id}")
-    public ResponseEntity<String> hardDeleteProject(@PathVariable Long id) {
-
-            projectService.hardDeleteProject(id);
-            return ResponseEntity.ok("Project successfully HARD Delete edildi.");
-
-    }
+//    @DeleteMapping("/hard/{id}")
+//    public ResponseEntity<String> hardDeleteProject(@PathVariable Long id) {
+//
+//            projectService.hardDeleteProject(id);
+//            return ResponseEntity.ok("Project successfully HARD Delete edildi.");
+//
+//    }
 }

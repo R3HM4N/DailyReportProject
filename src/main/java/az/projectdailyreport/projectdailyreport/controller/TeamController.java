@@ -37,18 +37,6 @@ public class TeamController {
         return new ResponseEntity<>(createdTeam, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteTeam(@PathVariable Long id) {
-        teamService.deleteTeam(id);
-        return ResponseEntity.ok("Team successfully HARD Delete edildi.");
-    }
 
-    @DeleteMapping("/soft/{id}")
-    public ResponseEntity<String> softDeleteTeam(@PathVariable Long id) {
-
-            teamService.softDeleteTeam(id);
-            return ResponseEntity.ok("Team successfully SOFT Delete edildi.");
-
-    }
 }
 
