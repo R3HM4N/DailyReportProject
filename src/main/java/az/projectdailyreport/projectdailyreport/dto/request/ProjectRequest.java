@@ -1,4 +1,4 @@
-package az.projectdailyreport.projectdailyreport.dto;
+package az.projectdailyreport.projectdailyreport.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoleDto {
+public class ProjectRequest {
 
-    private String roleName;
+    private String projectName;
+
 
 }

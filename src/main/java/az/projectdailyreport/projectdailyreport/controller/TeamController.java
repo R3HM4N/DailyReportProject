@@ -1,5 +1,5 @@
 package az.projectdailyreport.projectdailyreport.controller;
-import az.projectdailyreport.projectdailyreport.dto.TeamDto;
+import az.projectdailyreport.projectdailyreport.dto.TeamDTO;
 import az.projectdailyreport.projectdailyreport.model.Team;
 import az.projectdailyreport.projectdailyreport.service.TeamService;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class TeamController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Team> createTeam(@RequestBody TeamDto teamDto) {
+    public ResponseEntity<Team> createTeam(@RequestBody TeamDTO teamDto) {
         Team createdTeam = teamService.createTeam(teamDto);
         return new ResponseEntity<>(createdTeam, HttpStatus.CREATED);
     }

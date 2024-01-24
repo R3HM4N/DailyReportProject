@@ -1,6 +1,7 @@
 package az.projectdailyreport.projectdailyreport.service.impl;
 
-import az.projectdailyreport.projectdailyreport.dto.ProjectDto;
+import az.projectdailyreport.projectdailyreport.dto.ProjectDTO;
+import az.projectdailyreport.projectdailyreport.dto.request.ProjectRequest;
 import az.projectdailyreport.projectdailyreport.exception.ProjectAlreadyDeletedException;
 import az.projectdailyreport.projectdailyreport.exception.ProjectExistsException;
 import az.projectdailyreport.projectdailyreport.exception.ProjectNotFoundException;
@@ -24,13 +25,13 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    public Project createProject(ProjectDto projectDto) {
-        if (projectRepository.existsByProjectName(projectDto.getProjectName())) {
+    public Project createProject(ProjectRequest projectRequest) {
+        if (projectRepository.existsByProjectName(projectRequest.getProjectName())) {
             // Proje zaten varsa EntityExistsException fırlat
             throw new ProjectExistsException("A project with the same name already exists.");
         }
         Project project = new Project();
-        project.setProjectName(projectDto.getProjectName());
+        project.setProjectName(projectRequest.getProjectName());
         project.setStatus(Status.ACTIVE);
         return projectRepository.save(project);
     }

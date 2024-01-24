@@ -1,5 +1,7 @@
 package az.projectdailyreport.projectdailyreport.service.impl;
 
+import az.projectdailyreport.projectdailyreport.dto.UserDTO;
+import az.projectdailyreport.projectdailyreport.dto.UserGetDTO;
 import az.projectdailyreport.projectdailyreport.dto.request.CreateUserRequest;
 import az.projectdailyreport.projectdailyreport.exception.UserAlreadyDeletedException;
 import az.projectdailyreport.projectdailyreport.exception.UserNotFoundException;
@@ -12,15 +14,18 @@ import az.projectdailyreport.projectdailyreport.repository.TeamRepository;
 import az.projectdailyreport.projectdailyreport.repository.UserRepository;
 import az.projectdailyreport.projectdailyreport.service.ProjectService;
 import az.projectdailyreport.projectdailyreport.service.UserService;
+import az.projectdailyreport.projectdailyreport.unit.PageInfo;
+import az.projectdailyreport.projectdailyreport.unit.UserMapper;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,26 +57,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    public List<User> getUsersWithFilters(Status status, String firstName, String lastName, List<Long> projectIds) {
-        List<Project> projects = convertProjectIdsToProjects(projectIds);
 
-        List<User> users = userRepository.findAllWithFilters(status, firstName, lastName,projects);
-
-        // Proje filtreleme işlemi
-        List<User> filteredUsers = users.stream()
-                .filter(user -> user.getProjects().containsAll(projects))
-                .collect(Collectors.toList());
-
-        return filteredUsers;
-    }
-    private List<Project> convertProjectIdsToProjects(List<Long> projectIds) {
-        if (projectIds == null || projectIds.isEmpty()) {
-            return Collections.emptyList(); // Eğer proje ID'leri null veya boş ise boş bir liste döndür
-        }
-
-        else {
-        return projectRepository.findAllById(projectIds);
-    }}
 
     @Override
     @Transactional
@@ -81,5 +67,34 @@ public class UserServiceImpl implements UserService {
 
         userRepository.deleteById(userId);
     }
+
+    @Override
+    public Page<UserDTO> getUsersByFilters(String firstName, String lastName, Status status, Long teamId, List<Long> projectIds, Pageable pageable) {
+        // UserRepository'den sayfalama ile kullanıcıları alma
+        Page<User> usersPage = userRepository.findByFilters(firstName, lastName, status, teamId, projectIds, pageable);
+
+        // User listesini UserDTO listesine dönüştürme
+        List<UserDTO> userDTOList = usersPage.getContent()
+                .stream()
+                .map(UserMapper::toDTO)
+                .collect(Collectors.toList());
+
+        // UserDTO listesini kullanarak yeni bir Page oluşturma
+        return new PageImpl<>(userDTOList, pageable, usersPage.getTotalElements());
+    }
+
+    @Override
+    public UserGetDTO  getUserById(Long userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            UserGetDTO userGetDTO = UserMapper.toByDTO(user);
+            return userGetDTO;
+        } else {
+            throw new EntityNotFoundException("User not found with id: " + userId);
+        }
+    }
+
 }
 

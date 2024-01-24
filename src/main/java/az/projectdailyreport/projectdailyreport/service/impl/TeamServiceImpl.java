@@ -1,14 +1,11 @@
 package az.projectdailyreport.projectdailyreport.service.impl;
 
-import az.projectdailyreport.projectdailyreport.dto.TeamDto;
-import az.projectdailyreport.projectdailyreport.exception.TeamAlreadyDeletedException;
+import az.projectdailyreport.projectdailyreport.dto.TeamDTO;
 import az.projectdailyreport.projectdailyreport.exception.TeamExistsException;
-import az.projectdailyreport.projectdailyreport.exception.TeamNotFoundException;
 import az.projectdailyreport.projectdailyreport.model.Status;
 import az.projectdailyreport.projectdailyreport.model.Team;
 import az.projectdailyreport.projectdailyreport.repository.TeamRepository;
 import az.projectdailyreport.projectdailyreport.service.TeamService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +31,7 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public Team createTeam(TeamDto teamDto) {
+    public Team createTeam(TeamDTO teamDto) {
         String teamName = teamDto.getTeamName();
 
         if (teamRepository.existsByTeamName(teamName)) {

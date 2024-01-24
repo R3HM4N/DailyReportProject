@@ -23,8 +23,8 @@ public class Project {
 
     //    @OneToMany(mappedBy = "project")
     //    private List<DailyReport> dailyReports;
-//
-//        @ManyToMany(mappedBy = "projects")
+
+//    @ManyToMany(mappedBy = "projects", fetch = FetchType.LAZY)
 //        private Set<User> users = new HashSet<>();
 
 }

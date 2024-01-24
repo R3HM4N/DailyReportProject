@@ -1,9 +1,8 @@
 package az.projectdailyreport.projectdailyreport.controller;
 
-import az.projectdailyreport.projectdailyreport.dto.ProjectDto;
-import az.projectdailyreport.projectdailyreport.dto.TeamDto;
+import az.projectdailyreport.projectdailyreport.dto.ProjectDTO;
+import az.projectdailyreport.projectdailyreport.dto.request.ProjectRequest;
 import az.projectdailyreport.projectdailyreport.model.Project;
-import az.projectdailyreport.projectdailyreport.model.Team;
 import az.projectdailyreport.projectdailyreport.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,8 +23,8 @@ public class ProjectController {
         return projectService.getAllProject();
     }
     @PostMapping("/create")
-    public ResponseEntity<Project> createProject(@RequestBody ProjectDto projectDto) {
-       Project project =projectService.createProject(projectDto);
+    public ResponseEntity<Project> createProject(@RequestBody ProjectRequest projectRequest) {
+       Project project =projectService.createProject(projectRequest);
         return new ResponseEntity<>(project, HttpStatus.CREATED);
     }
 

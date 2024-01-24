@@ -1,5 +1,8 @@
 package az.projectdailyreport.projectdailyreport.service.impl;
 
+import az.projectdailyreport.projectdailyreport.dto.DailyReportDTO;
+import az.projectdailyreport.projectdailyreport.dto.ProjectDTO;
+import az.projectdailyreport.projectdailyreport.dto.UserDTO;
 import az.projectdailyreport.projectdailyreport.dto.request.DailyReportRequest;
 import az.projectdailyreport.projectdailyreport.exception.DuplicateReportException;
 import az.projectdailyreport.projectdailyreport.model.DailyReport;
@@ -9,7 +12,9 @@ import az.projectdailyreport.projectdailyreport.repository.DailyReportRepository
 import az.projectdailyreport.projectdailyreport.service.DailyReportService;
 import az.projectdailyreport.projectdailyreport.service.ProjectService;
 import az.projectdailyreport.projectdailyreport.service.UserService;
+import az.projectdailyreport.projectdailyreport.unit.UserMapper;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -29,12 +34,14 @@ public class DailyReportServiceImpl implements DailyReportService {
 
 
     @Override
-    public DailyReport createDailyReport(DailyReportRequest dailyReportRequest, User user) {
+    public DailyReportDTO createDailyReport(DailyReportRequest dailyReportRequest, User user) {
         Project project = projectService.getProjectById(dailyReportRequest.getProjectId());
         if (dailyReportRepository.existsByProjectAndUserAndLocalDateTimeBetween(
                 project, user, startOfDay, endOfDay)) {
             throw new DuplicateReportException("Aynı projeye ve kullanıcıya ait rapor zaten mevcut.");
         }
+
+        // DailyReport'ı oluştur ve kaydet
         DailyReport dailyReport = new DailyReport();
         dailyReport.setFirstName(user.getFirstName());
         dailyReport.setLastName(user.getLastName());
@@ -43,5 +50,22 @@ public class DailyReportServiceImpl implements DailyReportService {
         dailyReport.setUser(user);
         dailyReport.setProject(project);
 
-        return dailyReportRepository.save(dailyReport);
-}}
+        DailyReport savedReport = dailyReportRepository.save(dailyReport);
+
+        // ModelMapper kullanarak dönüşümleri gerçekleştir
+        ModelMapper modelMapper = new ModelMapper();
+
+        // UserDTO ve ProjectDTO'ları doldur
+        UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+        ProjectDTO projectDTO = modelMapper.map(project, ProjectDTO.class);
+
+        // DailyReportDTO'ya dönüştürme işlemi
+        DailyReportDTO dailyReportDTO = modelMapper.map(savedReport, DailyReportDTO.class);
+      
+
+        return dailyReportDTO;
+    }
+    }
+
+
+

@@ -1,5 +1,6 @@
 package az.projectdailyreport.projectdailyreport.controller;
 
+import az.projectdailyreport.projectdailyreport.dto.DailyReportDTO;
 import az.projectdailyreport.projectdailyreport.dto.request.DailyReportRequest;
 import az.projectdailyreport.projectdailyreport.model.DailyReport;
 import az.projectdailyreport.projectdailyreport.model.User;
@@ -23,12 +24,19 @@ public class DailyReportController {
     private final DailyReportService dailyReportService;
     private final UserRepository userRepository;
     long a =1;
-    @PostMapping("/reports")//public
-    public ResponseEntity<DailyReport> createDailyReport(@RequestBody DailyReportRequest reportRequest) {
-//        User signedInUser = authenticationService.getSignedInUser();
+    @PostMapping("/reports")
+    public ResponseEntity<DailyReportDTO> createDailyReport(@RequestBody DailyReportRequest reportRequest) {
+        Optional<User> userOptional = userRepository.findById(a);
 
-        Optional<User> user1 =userRepository.findById(a);
-        DailyReport createdReport = dailyReportService.createDailyReport(reportRequest,user1.get());
+        //        User signedInUser = authenticationService.getSignedInUser();
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        User user = userOptional.get();
+        DailyReportDTO createdReport = dailyReportService.createDailyReport(reportRequest, user);
+
         return new ResponseEntity<>(createdReport, HttpStatus.CREATED);
     }
 }

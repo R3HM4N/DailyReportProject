@@ -1,5 +1,6 @@
 package az.projectdailyreport.projectdailyreport.dto;
 
+import az.projectdailyreport.projectdailyreport.model.RoleName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +10,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TeamDto {
-    private String teamName;
+public class RoleDTO {
+
+    private Long id;
+
+    private RoleName roleName;
 
 }

@@ -1,17 +1,13 @@
 package az.projectdailyreport.projectdailyreport.dto.request;
-import az.projectdailyreport.projectdailyreport.dto.TeamDto;
-import az.projectdailyreport.projectdailyreport.model.Project;
 import az.projectdailyreport.projectdailyreport.model.Role;
 import az.projectdailyreport.projectdailyreport.model.Team;
 import az.projectdailyreport.projectdailyreport.validation.CrocusoftEmail;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Set;
 
 
 @Data
