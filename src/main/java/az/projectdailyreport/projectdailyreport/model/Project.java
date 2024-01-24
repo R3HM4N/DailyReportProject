@@ -12,7 +12,7 @@ import java.util.Set;
 @Entity
 @Data
 @RequiredArgsConstructor
-public class Project implements Serializable{
+public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
