@@ -13,8 +13,7 @@ import java.util.List;
 @Data
 public class CreateUserRequest {
 
-    @NotBlank(message = "Kullanıcı adı boş olamaz")
-    private String userName;
+
 
     @NotBlank(message = "Ad boş olamaz")
     private String firstName;
@@ -36,7 +35,6 @@ public class CreateUserRequest {
     @NotNull(message = "Takım belirtilmelidir")
     private Team team;
 
-    private List<Long> projectIds;
 
 
 //    public CreateUserRequest(String userName, String firstName, String lastName, String password, Role role,     String mail, Team team, Set<Project> projects) {

@@ -6,13 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserGetDTO {
     private Long id;
-    private String userName;
     private String firstName;
     private String lastName;
     private  RoleDTO role;

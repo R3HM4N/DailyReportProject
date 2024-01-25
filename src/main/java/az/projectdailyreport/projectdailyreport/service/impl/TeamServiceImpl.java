@@ -1,12 +1,15 @@
 package az.projectdailyreport.projectdailyreport.service.impl;
 
 import az.projectdailyreport.projectdailyreport.dto.TeamDTO;
+import az.projectdailyreport.projectdailyreport.dto.TeamResponse;
 import az.projectdailyreport.projectdailyreport.exception.TeamExistsException;
+import az.projectdailyreport.projectdailyreport.exception.TeamNotFoundException;
 import az.projectdailyreport.projectdailyreport.model.Status;
 import az.projectdailyreport.projectdailyreport.model.Team;
 import az.projectdailyreport.projectdailyreport.repository.TeamRepository;
 import az.projectdailyreport.projectdailyreport.service.TeamService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,7 +34,7 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public Team createTeam(TeamDTO teamDto) {
+    public Team createTeam(TeamResponse teamDto) {
         String teamName = teamDto.getTeamName();
 
         if (teamRepository.existsByTeamName(teamName)) {
@@ -42,6 +45,30 @@ public class TeamServiceImpl implements TeamService {
         team.setStatus(Status.ACTIVE);
         return teamRepository.save(team);
     }
+
+    @Override
+    public Team updateTeam(Long teamId, TeamResponse updatedTeamDto) {
+        Team existingTeam = teamRepository.findById(teamId)
+                .orElseThrow(() -> new TeamNotFoundException(teamId));
+
+        String updatedTeamName = updatedTeamDto.getTeamName();
+
+        // Check if the updated team name is not already in use by another team
+        if (!existingTeam.getTeamName().equals(updatedTeamName) &&
+                teamRepository.existsByTeamName(updatedTeamName)) {
+            throw new TeamExistsException("Another team with the same name already exists.");
+        }
+
+        // Use ModelMapper to map fields from updatedTeamDto to existingTeam
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.map(updatedTeamDto, existingTeam);
+
+        // You can also update other fields if needed
+
+        // Save the updated team
+        return teamRepository.save(existingTeam);
+    }
+
 
 //    @Override
 //    public void deleteTeam(Long id) {

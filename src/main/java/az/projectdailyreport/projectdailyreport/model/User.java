@@ -4,19 +4,21 @@ import az.projectdailyreport.projectdailyreport.validation.CrocusoftEmail;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
 @Data
 @RequiredArgsConstructor
+@Getter
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String userName;
     private String firstName;
     private String lastName;
     private String Password;
@@ -36,20 +38,13 @@ public class User {
     @JoinColumn(name = "team_id")  // Bu alan, User'ın hangi Team'e ait olduğunu belirtir
     private Team team;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_project",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "project_id")
-    )
-    private Set<Project> projects = new HashSet<>();
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "users", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    List<Project> projects;
 
 
     @OneToMany(mappedBy = "user")
     private Set<DailyReport> dailyReports;
 
-    public User(String userName) {
-        this.userName = userName;
-    }
+
 
 }

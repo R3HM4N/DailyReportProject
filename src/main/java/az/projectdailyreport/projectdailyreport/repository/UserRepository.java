@@ -5,6 +5,7 @@ import az.projectdailyreport.projectdailyreport.model.Status;
 import az.projectdailyreport.projectdailyreport.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -20,6 +21,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("UPDATE User u SET u.status = 'DELETED' WHERE u.id = :userId")
     void softDeleteUser(@Param("userId") Long userId);
 
+    @EntityGraph(attributePaths = "projects")
+    Optional<User> findById(Long id);
 
 
     @Query("SELECT DISTINCT u FROM User u JOIN u.projects p " +
@@ -36,7 +39,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
             @Param("projectIds") List<Long> projectIds,
             Pageable pageable
     );
-    Optional<User> findById(Long id);
+
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.projects WHERE u.id = :userId")
+    Optional<User> findByIdWithProjects(@Param("userId") Long userId);
 
 
 

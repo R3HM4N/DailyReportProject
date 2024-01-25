@@ -1,6 +1,8 @@
 package az.projectdailyreport.projectdailyreport.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -17,7 +19,7 @@ public class DailyReport {
 
     private String firstName;
     private String lastName;
-
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "UTC")
     private LocalDateTime localDateTime;
     private String reportText;
 

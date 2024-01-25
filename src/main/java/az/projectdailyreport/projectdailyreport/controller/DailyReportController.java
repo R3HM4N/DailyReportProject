@@ -2,6 +2,8 @@ package az.projectdailyreport.projectdailyreport.controller;
 
 import az.projectdailyreport.projectdailyreport.dto.DailyReportDTO;
 import az.projectdailyreport.projectdailyreport.dto.request.DailyReportRequest;
+import az.projectdailyreport.projectdailyreport.exception.DailyReportUpdateException;
+import az.projectdailyreport.projectdailyreport.exception.ReportNotFoundException;
 import az.projectdailyreport.projectdailyreport.model.DailyReport;
 import az.projectdailyreport.projectdailyreport.model.User;
 import az.projectdailyreport.projectdailyreport.repository.UserRepository;
@@ -38,5 +40,14 @@ public class DailyReportController {
         DailyReportDTO createdReport = dailyReportService.createDailyReport(reportRequest, user);
 
         return new ResponseEntity<>(createdReport, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{reportId}")
+    public ResponseEntity<DailyReportDTO> updateDailyReport(@PathVariable Long reportId,
+                                                            @RequestBody DailyReportRequest updatedReportText) {
+
+            DailyReportDTO updatedReportDTO = dailyReportService.updateDailyReport(reportId, updatedReportText);
+            return new ResponseEntity<>(updatedReportDTO, HttpStatus.OK);
+
     }
 }

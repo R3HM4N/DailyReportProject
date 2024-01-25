@@ -19,9 +19,6 @@ public class DailyReportDTO {
     private LocalDateTime localDateTime;
     private String reportText;
 
-
-
-
     public DailyReportDTO(Long id, String firstName, String lastName, LocalDateTime localDateTime, String reportText) {
         this.id = id;
         this.firstName = firstName;

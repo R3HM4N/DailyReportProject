@@ -1,8 +1,10 @@
 package az.projectdailyreport.projectdailyreport.controller;
 import az.projectdailyreport.projectdailyreport.dto.TeamDTO;
+import az.projectdailyreport.projectdailyreport.dto.TeamResponse;
 import az.projectdailyreport.projectdailyreport.model.Team;
 import az.projectdailyreport.projectdailyreport.service.TeamService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,10 +34,23 @@ public class TeamController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Team> createTeam(@RequestBody TeamDTO teamDto) {
+    public ResponseEntity<Team> createTeam(@RequestBody TeamResponse teamDto) {
         Team createdTeam = teamService.createTeam(teamDto);
         return new ResponseEntity<>(createdTeam, HttpStatus.CREATED);
     }
+    @PutMapping("/{teamId}")
+    public ResponseEntity<TeamDTO> updateTeam(@PathVariable Long teamId,
+                                              @RequestBody TeamResponse updatedTeamDto) {
+        Team updatedTeam = teamService.updateTeam(teamId, updatedTeamDto);
+        TeamDTO responseDto = convertToDto(updatedTeam);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
+    private TeamDTO convertToDto(Team team) {
+        ModelMapper modelMapper = new ModelMapper();
+        return modelMapper.map(team, TeamDTO.class);
+
+}
 
 
 }

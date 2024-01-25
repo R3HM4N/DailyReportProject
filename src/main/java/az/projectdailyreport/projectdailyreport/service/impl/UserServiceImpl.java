@@ -1,5 +1,6 @@
 package az.projectdailyreport.projectdailyreport.service.impl;
 
+import az.projectdailyreport.projectdailyreport.dto.ProjectDTO;
 import az.projectdailyreport.projectdailyreport.dto.UserDTO;
 import az.projectdailyreport.projectdailyreport.dto.UserGetDTO;
 import az.projectdailyreport.projectdailyreport.dto.request.CreateUserRequest;
@@ -19,6 +20,8 @@ import az.projectdailyreport.projectdailyreport.unit.UserMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
+import org.modelmapper.ModelMapper;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -28,22 +31,23 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final ProjectService projectService;
-    private final RoleRepository roleRepository;
-    private final TeamRepository teamRepository;
-    private final ProjectRepository projectRepository;
+    private final ModelMapper modelMapper;
+//    private final ProjectService projectService;
+//    private final RoleRepository roleRepository;
+//    private final TeamRepository teamRepository;
+//    private final ProjectRepository projectRepository;
 
 
     @Override
     public User createUser(CreateUserRequest createUserRequest) {
         // CreateUserRequest'ten User entity'si oluştur
         User user = new User();
-        user.setUserName(createUserRequest.getUserName());
         user.setFirstName(createUserRequest.getFirstName());
         user.setLastName(createUserRequest.getLastName());
         user.setPassword(createUserRequest.getPassword());
@@ -51,13 +55,14 @@ public class UserServiceImpl implements UserService {
         user.setStatus(Status.ACTIVE);
         user.setMail(createUserRequest.getMail());
         user.setTeam(createUserRequest.getTeam());
-        user.setProjects(new HashSet<>(projectService.getProjectByIds(createUserRequest.getProjectIds())));
 
         // User'ı kaydet
         return userRepository.save(user);
     }
-
-
+    @Override
+    public List<User> getUsersByIds(List<Long> userIds) {
+        List<User> userList = userRepository.findAllById(userIds);
+        return  userList;}
 
     @Override
     @Transactional
@@ -84,17 +89,47 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserGetDTO  getUserById(Long userId) {
+    @Transactional
+    public UserGetDTO getUserById(Long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
+            if (!Hibernate.isInitialized(user.getProjects())) {
+                Hibernate.initialize(user.getProjects());
+            }
+
             UserGetDTO userGetDTO = UserMapper.toByDTO(user);
+            List<ProjectDTO> projectDTOs = user.getProjects()
+                    .stream()
+                    .map(project -> modelMapper.map(project, ProjectDTO.class))
+                    .collect(Collectors.toList());
+
+            userGetDTO.setProjects(projectDTOs);
             return userGetDTO;
         } else {
             throw new EntityNotFoundException("User not found with id: " + userId);
         }
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
 }
+
+
+
+
+
+
+
 

@@ -110,4 +110,23 @@ public class GeneralExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 exception.getMessage());
     }
+
+    @ExceptionHandler(ReportNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionResponse handleReportNotFoundException (ReportNotFoundException  exception) {
+        return new ExceptionResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage());
+    }
+    @ExceptionHandler(DailyReportUpdateException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionResponse handleDailyReportUpdateException  (DailyReportUpdateException   exception) {
+        return new ExceptionResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage());
+    }
 }

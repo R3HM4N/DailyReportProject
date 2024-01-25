@@ -7,4 +7,7 @@ import az.projectdailyreport.projectdailyreport.model.User;
 
 public interface DailyReportService {
      DailyReportDTO createDailyReport(DailyReportRequest dailyReportRequest, User user);
+
+     DailyReportDTO updateDailyReport(Long reportId, DailyReportRequest updatedReportText);
 }
+

@@ -21,10 +21,18 @@ public class Project {
 
     private String projectName;
 
-    //    @OneToMany(mappedBy = "project")
-    //    private List<DailyReport> dailyReports;
 
-//    @ManyToMany(mappedBy = "projects", fetch = FetchType.LAZY)
-//        private Set<User> users = new HashSet<>();
+
+//    @ManyToMany(mappedBy = "projects", cascade = CascadeType.PERSIST)
+//    @JoinTable(
+//            name = "projectt_userr",
+//            joinColumns = @JoinColumn(name = "project_id"),
+//            inverseJoinColumns = @JoinColumn(name = "user_id")
+//    )
+//    private Set<User> users;
+@ManyToMany(fetch = FetchType.EAGER)
+List<User> users;
 
 }
+//    @OneToMany(mappedBy = "project")
+//    private List<DailyReport> dailyReports;

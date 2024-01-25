@@ -10,11 +10,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Set;
 
 public interface UserService {
     User createUser(CreateUserRequest createUserRequest);
 //    void softDeleteUser(Long userId);
     void hardDeleteUser(Long userId);
+    List<User> getUsersByIds(List<Long> userIds);
+
+
 
     Page<UserDTO> getUsersByFilters(String firstName, String lastName, Status status, Long teamId, List<Long> projectIds, Pageable pageable);
     UserGetDTO getUserById(Long userId);
