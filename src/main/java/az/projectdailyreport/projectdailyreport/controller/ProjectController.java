@@ -1,7 +1,9 @@
 package az.projectdailyreport.projectdailyreport.controller;
 
-import az.projectdailyreport.projectdailyreport.dto.ProjectDTO;
-import az.projectdailyreport.projectdailyreport.dto.ProjectResponse;
+import az.projectdailyreport.projectdailyreport.dto.project.ProjectDTO;
+import az.projectdailyreport.projectdailyreport.dto.project.ProjectGetDto;
+import az.projectdailyreport.projectdailyreport.dto.project.ProjectResponse;
+import az.projectdailyreport.projectdailyreport.dto.project.ProjectUpdateDto;
 import az.projectdailyreport.projectdailyreport.dto.request.ProjectRequest;
 import az.projectdailyreport.projectdailyreport.model.Project;
 import az.projectdailyreport.projectdailyreport.service.ProjectService;
@@ -21,7 +23,7 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @GetMapping("/get")
-    public List<Project> getAllProjects() {
+    public List<ProjectGetDto> getAllProjects() {
         return projectService.getAllProject();
     }
     @PostMapping
@@ -31,21 +33,29 @@ public class ProjectController {
     }
 
     @PutMapping("/{projectId}")
-    public ResponseEntity<ProjectResponse> updateProject(@PathVariable Long projectId,
-                                                         @RequestBody ProjectRequest updatedProjectRequest) {
-        Project updatedProject = projectService.updateProject(projectId, updatedProjectRequest);
-        ProjectResponse responseDto = convertToDto(updatedProject);
+    public ResponseEntity<ProjectDTO> updateProject(@PathVariable Long projectId,
+                                                    @RequestBody ProjectUpdateDto projectUpdateDto) {
+        Project updatedProject = projectService.updateProject(projectId, projectUpdateDto);
+        ProjectDTO responseDto = projectService.convertToDto(updatedProject);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
-    private ProjectResponse convertToDto(Project project) {
-        ModelMapper modelMapper = new ModelMapper();
-        return modelMapper.map(project, ProjectResponse.class);
-    }
+
     @DeleteMapping("/soft/{id}")
     public ResponseEntity<String> softDeleteProject(@PathVariable Long id) {
             projectService.softDeleteProject(id);
             return ResponseEntity.ok("Project successfully SOFT Delete edildi.");
+    }
+
+    @DeleteMapping("/{projectId}/users/{userId}")
+    public ResponseEntity<String> removeUserFromProject(@PathVariable Long projectId, @PathVariable Long userId) {
+        projectService.removeUserFromProject(projectId, userId);
+        return ResponseEntity.ok("User removed from project successfully.");
+    }
+    @PostMapping("/{projectId}/users/{userId}")
+    public ResponseEntity<String> addUserToProject(@PathVariable Long projectId, @PathVariable Long userId) {
+        projectService.addUserToProject(projectId, userId);
+        return ResponseEntity.ok("User added to project successfully.");
     }
 
     // Hard Delete

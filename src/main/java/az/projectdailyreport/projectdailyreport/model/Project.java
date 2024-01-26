@@ -23,16 +23,12 @@ public class Project {
 
 
 
-//    @ManyToMany(mappedBy = "projects", cascade = CascadeType.PERSIST)
-//    @JoinTable(
-//            name = "projectt_userr",
-//            joinColumns = @JoinColumn(name = "project_id"),
-//            inverseJoinColumns = @JoinColumn(name = "user_id")
-//    )
-//    private Set<User> users;
 @ManyToMany(fetch = FetchType.EAGER)
 List<User> users;
 
 }
+
+
+
 //    @OneToMany(mappedBy = "project")
 //    private List<DailyReport> dailyReports;

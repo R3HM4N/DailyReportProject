@@ -25,20 +25,27 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findById(Long id);
 
 
-    @Query("SELECT DISTINCT u FROM User u JOIN u.projects p " +
-            "WHERE (:firstName IS NULL OR u.firstName LIKE %:firstName%) AND " +
-            "(:lastName IS NULL OR u.lastName LIKE %:lastName%) AND " +
-            "(:status IS NULL OR u.status = :status) AND " +
-            "(:teamId IS NULL OR u.team.id = :teamId) AND " +
-            "(:projectIds IS NULL OR p.id IN :projectIds)")
-    Page<User> findByFilters(
-            @Param("firstName") String firstName,
-            @Param("lastName") String lastName,
-            @Param("status") Status status,
-            @Param("teamId") Long teamId,
-            @Param("projectIds") List<Long> projectIds,
-            Pageable pageable
-    );
+    //    @Query("SELECT DISTINCT u FROM User u JOIN u.projects p " +
+    //            "WHERE (:firstName IS NULL OR u.firstName LIKE %:firstName%) AND " +
+    //            "(:lastName IS NULL OR u.lastName LIKE %:lastName%) AND " +
+    //            "(:status IS NULL OR u.status = :status) AND " +
+    //            "(:teamId IS NULL OR u.team.id = :teamId) AND " +
+    //            "(:projectIds IS NULL OR (:projectIds IS NOT NULL AND p.id IN :projectIds))")
+    //    Page<User> findByFilters(
+    //            @Param("firstName") String firstName,
+    //            @Param("lastName") String lastName,
+    //            @Param("status") Status status,
+    //            @Param("teamId") Long teamId,
+    //            @Param("projectIds") List<Long> projectIds,
+    //            Pageable pageable
+    //    );
+    @Query("SELECT u FROM User u " +
+            "WHERE (:firstName IS NULL OR u.firstName LIKE %:firstName%) " +
+            "AND (:lastName IS NULL OR u.lastName LIKE %:lastName%)" +
+            "AND (:status IS NULL OR u.status = :status) " +
+            "AND (:teamIds IS NULL OR u.team.id IN :teamIds) " +
+            "AND (:projectIds IS NULL OR EXISTS (SELECT p FROM u.projects p WHERE p.id IN :projectIds))")
+    Page<User> findByFilters(String firstName, String lastName, Status status, List<Long> teamIds, List<Long> projectIds, Pageable pageable);
 
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.projects WHERE u.id = :userId")
     Optional<User> findByIdWithProjects(@Param("userId") Long userId);

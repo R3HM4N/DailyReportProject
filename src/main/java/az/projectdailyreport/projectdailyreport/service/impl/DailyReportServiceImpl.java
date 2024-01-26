@@ -1,7 +1,7 @@
 package az.projectdailyreport.projectdailyreport.service.impl;
 
 import az.projectdailyreport.projectdailyreport.dto.DailyReportDTO;
-import az.projectdailyreport.projectdailyreport.dto.ProjectDTO;
+import az.projectdailyreport.projectdailyreport.dto.project.ProjectDTO;
 import az.projectdailyreport.projectdailyreport.dto.UserDTO;
 import az.projectdailyreport.projectdailyreport.dto.request.DailyReportRequest;
 import az.projectdailyreport.projectdailyreport.exception.DailyReportUpdateException;
@@ -14,7 +14,6 @@ import az.projectdailyreport.projectdailyreport.repository.DailyReportRepository
 import az.projectdailyreport.projectdailyreport.service.DailyReportService;
 import az.projectdailyreport.projectdailyreport.service.ProjectService;
 import az.projectdailyreport.projectdailyreport.service.UserService;
-import az.projectdailyreport.projectdailyreport.unit.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;

@@ -14,7 +14,6 @@ import java.util.List;
 public class CreateUserRequest {
 
 
-
     @NotBlank(message = "Ad boş olamaz")
     private String firstName;
 
@@ -33,7 +32,8 @@ public class CreateUserRequest {
     private String mail;
 
     @NotNull(message = "Takım belirtilmelidir")
-    private Team team;
+    private Long teamId;
+
 
 
 

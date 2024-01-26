@@ -1,6 +1,8 @@
 package az.projectdailyreport.projectdailyreport.controller;
-import az.projectdailyreport.projectdailyreport.dto.TeamDTO;
+import az.projectdailyreport.projectdailyreport.dto.UserDTO;
+import az.projectdailyreport.projectdailyreport.dto.team.TeamDTO;
 import az.projectdailyreport.projectdailyreport.dto.TeamResponse;
+import az.projectdailyreport.projectdailyreport.dto.team.TeamGetByIdDto;
 import az.projectdailyreport.projectdailyreport.model.Team;
 import az.projectdailyreport.projectdailyreport.service.TeamService;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +29,27 @@ public class TeamController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Team> getTeamById(@PathVariable Long id) {
-        Optional<Team> team = teamService.getTeamById(id);
-        return team.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    public ResponseEntity<TeamGetByIdDto> getTeamById(@PathVariable Long id) {
+        TeamGetByIdDto teamDto = teamService.getById(id);
+
+        if (teamDto != null) {
+            return new ResponseEntity<>(teamDto, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+}
+    @PostMapping("/{teamId}/users/{userId}")
+    public ResponseEntity<String> addUserToTeam(@PathVariable Long teamId, @PathVariable Long userId) {
+        teamService.addUserToTeam(teamId, userId);
+        return ResponseEntity.ok("User successfully added to the team.");
+
+    }
+
+    @DeleteMapping("/{teamId}/users/{userId}")
+    public ResponseEntity<String> removeUserFromTeam(@PathVariable Long teamId, @PathVariable Long userId) {
+        teamService.removeUserFromTeam(teamId, userId);
+        return ResponseEntity.ok("User successfully removed from the team.");
     }
 
     @PostMapping("/create")

@@ -1,12 +1,12 @@
 package az.projectdailyreport.projectdailyreport.controller;
 
-import az.projectdailyreport.projectdailyreport.dto.UserDTO;
-import az.projectdailyreport.projectdailyreport.dto.UserGetDTO;
+import az.projectdailyreport.projectdailyreport.dto.*;
 import az.projectdailyreport.projectdailyreport.dto.request.CreateUserRequest;
 import az.projectdailyreport.projectdailyreport.model.Status;
 import az.projectdailyreport.projectdailyreport.model.User;
 import az.projectdailyreport.projectdailyreport.service.UserService;
 import az.projectdailyreport.projectdailyreport.unit.PageInfo;
+import az.projectdailyreport.projectdailyreport.unit.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,7 +16,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,17 +39,19 @@ public class UserController {
 //        return new ResponseEntity<>("User soft deleted successfully", HttpStatus.OK);
 //    }
 
-    @DeleteMapping("/harddelete/{userId}")
-    public ResponseEntity<String> hardDeleteUser(@PathVariable Long userId) {
-        userService.hardDeleteUser(userId);
-        return ResponseEntity.ok("User successfully hard delete edildi.");
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<String> softDeleteUser(@PathVariable Long userId) {
+        userService.softDeleteUser(userId);
+        return new ResponseEntity<>("User soft deleted successfully", HttpStatus.OK);
     }
+
+
     @GetMapping("/filters")
     public ResponseEntity<Page<UserDTO>> getUsersByFilters(
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) Status status,
-            @RequestParam(required = false) Long teamId,
+            @RequestParam(required = false) List<Long> teamId,
             @RequestParam(required = false) List<Long> projectIds,
             @RequestParam(name = "pageNumber", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer size,
@@ -59,17 +63,31 @@ public class UserController {
 
         // UserService'den sayfalama ile kullanıcıları alma
         Page<UserDTO> users = userService.getUsersByFilters(firstName, lastName, status, teamId, projectIds, pageable);
-
         return ResponseEntity.ok(users);
-    }
 
+    }
     @GetMapping("/{userId}")
     public ResponseEntity<UserGetDTO> getUserById(@PathVariable Long userId) {
         UserGetDTO userDTO = userService.getUserById(userId);
-        return new ResponseEntity<>(userDTO, HttpStatus.OK);
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);}
+
+    @GetMapping("/status/list")
+    public List<String> getStatusList() {
+        return Arrays.stream(Status.values())
+                .map(Enum::name)
+                .collect(Collectors.toList());
     }
 
+    @PutMapping("/{userId}")
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long userId, @RequestBody UserUpdateDTO updatedUserDTO) {
+        UserDTO updatedUser = userService.updateUser(userId, updatedUserDTO);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+
+    }
+    @PutMapping("/{userId}/status")
+    public ResponseEntity<String> changeUserStatus(@PathVariable Long userId, @RequestParam Status newStatus) {
+        userService.changeUserStatus(userId, newStatus);
+        return ResponseEntity.ok("User status has been updated successfully");
+    }
 
 }
-
-

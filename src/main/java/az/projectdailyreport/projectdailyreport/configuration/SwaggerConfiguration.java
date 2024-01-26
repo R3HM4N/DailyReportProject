@@ -25,10 +25,10 @@ public class SwaggerConfiguration {
     public OpenAPI myOpenAPI() {
 
         Contact contact = new Contact();
-
+        contact.setName("Crocusoft Company");
 
         Info info = new Info()
-                .title("Daily Report")
+                .title("Daily Report API")
                 .version("1.0")
                 .contact(contact)
                 .description("OpenAPI documentation");

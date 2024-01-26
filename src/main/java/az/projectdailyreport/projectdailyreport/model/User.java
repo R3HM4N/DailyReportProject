@@ -1,6 +1,8 @@
 package az.projectdailyreport.projectdailyreport.model;
 
 import az.projectdailyreport.projectdailyreport.validation.CrocusoftEmail;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.Data;
@@ -30,11 +32,13 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    private boolean deleted = false;
+
     @CrocusoftEmail
     @Email(message = "Geçerli bir e-posta adresi değil")
     private String mail;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinColumn(name = "team_id")  // Bu alan, User'ın hangi Team'e ait olduğunu belirtir
     private Team team;
 
@@ -44,6 +48,8 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private Set<DailyReport> dailyReports;
+
+
 
 
 

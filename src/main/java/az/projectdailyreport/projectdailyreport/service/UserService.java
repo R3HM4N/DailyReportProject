@@ -1,7 +1,6 @@
 package az.projectdailyreport.projectdailyreport.service;
 
-import az.projectdailyreport.projectdailyreport.dto.UserDTO;
-import az.projectdailyreport.projectdailyreport.dto.UserGetDTO;
+import az.projectdailyreport.projectdailyreport.dto.*;
 import az.projectdailyreport.projectdailyreport.dto.request.CreateUserRequest;
 import az.projectdailyreport.projectdailyreport.model.Status;
 import az.projectdailyreport.projectdailyreport.model.User;
@@ -14,25 +13,15 @@ import java.util.Set;
 
 public interface UserService {
     User createUser(CreateUserRequest createUserRequest);
-//    void softDeleteUser(Long userId);
-    void hardDeleteUser(Long userId);
+    void softDeleteUser(Long userId);
     List<User> getUsersByIds(List<Long> userIds);
+    UserDTO updateUser(Long userId, UserUpdateDTO updatedUserDTO);
 
 
+    void changeUserStatus(Long userId, Status newStatus);
+    Page<UserDTO> getUsersByFilters(String firstName, String lastName, Status status, List<Long> teamId, List<Long> projectIds, Pageable pageable);    UserGetDTO getUserById(Long userId);
 
-    Page<UserDTO> getUsersByFilters(String firstName, String lastName, Status status, Long teamId, List<Long> projectIds, Pageable pageable);
-    UserGetDTO getUserById(Long userId);
 
-        //@Query("SELECT DISTINCT u FROM User u JOIN u.projects p " +
-    //           "WHERE (:firstName IS NULL OR u.firstName = :firstName) AND " +
-    //           "(:lastName IS NULL OR u.lastName = :lastName) AND " +
-    //           "(:status IS NULL OR u.status = :status) AND " +
-    //           "(:projectId IS NULL OR p.id = :projectId)")
-    //    List<User> findByFilters(
-    //        @Param("firstName") String firstName,
-    //        @Param("lastName") String lastName,
-    //        @Param("status") String status,
-    //        @Param("projectId") Long projectId);
 }
 
 

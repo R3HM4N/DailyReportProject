@@ -1,25 +1,37 @@
 package az.projectdailyreport.projectdailyreport.service.impl;
 
-import az.projectdailyreport.projectdailyreport.dto.TeamDTO;
+import az.projectdailyreport.projectdailyreport.dto.RoleDTO;
 import az.projectdailyreport.projectdailyreport.dto.TeamResponse;
+import az.projectdailyreport.projectdailyreport.dto.UserDTO;
+import az.projectdailyreport.projectdailyreport.dto.team.TeamGetByIdDto;
+import az.projectdailyreport.projectdailyreport.dto.team.TeamUserDto;
 import az.projectdailyreport.projectdailyreport.exception.TeamExistsException;
 import az.projectdailyreport.projectdailyreport.exception.TeamNotFoundException;
+import az.projectdailyreport.projectdailyreport.exception.UserNotFoundException;
 import az.projectdailyreport.projectdailyreport.model.Status;
 import az.projectdailyreport.projectdailyreport.model.Team;
+import az.projectdailyreport.projectdailyreport.model.User;
 import az.projectdailyreport.projectdailyreport.repository.TeamRepository;
+import az.projectdailyreport.projectdailyreport.repository.UserRepository;
 import az.projectdailyreport.projectdailyreport.service.TeamService;
+import az.projectdailyreport.projectdailyreport.service.UserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
 public class TeamServiceImpl implements TeamService {
 
     private final TeamRepository teamRepository;
+    private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
 
 
@@ -27,12 +39,67 @@ public class TeamServiceImpl implements TeamService {
     public List<Team> getAllTeams() {
         return teamRepository.findAll();
     }
-
     @Override
-    public Optional<Team> getTeamById(Long id) {
-        return teamRepository.findById(id);
+    @Transactional
+    public void removeUserFromTeam(Long teamId, Long userId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new TeamNotFoundException(teamId));
+
+        Optional<User> userOptional = team.getUsers().stream()
+                .filter(user -> user.getId().equals(userId))
+                .findFirst();
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            team.getUsers().remove(user);
+            user.setTeam(null); // Kullanıcının takım referansını temizleyin
+            userRepository.save(user); // Kullanıcıyı güncelleyin
+        } else {
+            throw new UserNotFoundException(userId);
+        }
+        teamRepository.save(team);
     }
 
+    @Override
+    @Transactional
+    public void addUserToTeam(Long teamId, Long userId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new TeamNotFoundException(teamId));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        user.setTeam(team);
+        team.getUsers().add(user);
+
+        teamRepository.save(team);
+    }
+    @Override
+    public TeamGetByIdDto getById(Long id) {
+        Team team = teamRepository.findById(id).orElse(null);
+        List<TeamUserDto> userDtos = team.getUsers().stream().map(x -> {
+            TeamUserDto dt = TeamUserDto.builder()
+                    .id(x.getId())
+                    .firstName(x.getFirstName())
+                    .lastName(x.getLastName())
+                    .role(RoleDTO.builder()
+                            .id(x.getRole().getId())
+                            .roleName(x.getRole().getRoleName())
+                            .build())
+
+                    .email(x.getMail())
+                    .build();
+            return dt;
+        }).collect(Collectors.toList());
+
+        TeamGetByIdDto dto = TeamGetByIdDto.builder()
+                .id(team.getId())
+                .name(team.getTeamName())
+                .users(userDtos)
+
+                .build();
+        return dto;
+    }
     @Override
     public Team createTeam(TeamResponse teamDto) {
         String teamName = teamDto.getTeamName();

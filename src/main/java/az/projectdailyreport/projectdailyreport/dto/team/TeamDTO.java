@@ -1,4 +1,4 @@
-package az.projectdailyreport.projectdailyreport.dto;
+package az.projectdailyreport.projectdailyreport.dto.team;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectDTO {
-
+public class TeamDTO {
     private Long id;
-    private String projectName;
+    private String teamName;
 
 }

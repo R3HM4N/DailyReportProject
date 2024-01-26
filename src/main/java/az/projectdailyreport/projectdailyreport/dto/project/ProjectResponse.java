@@ -1,5 +1,6 @@
-package az.projectdailyreport.projectdailyreport.dto;
+package az.projectdailyreport.projectdailyreport.dto.project;
 
+import az.projectdailyreport.projectdailyreport.dto.UserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

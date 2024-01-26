@@ -1,12 +1,13 @@
 package az.projectdailyreport.projectdailyreport.dto;
 
+import az.projectdailyreport.projectdailyreport.dto.project.ProjectDTO;
+import az.projectdailyreport.projectdailyreport.dto.team.TeamDTO;
 import az.projectdailyreport.projectdailyreport.model.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
