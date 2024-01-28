@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectFiltir {
+public class ProjectFilter {
 
     private Long id;
     private Status status;
