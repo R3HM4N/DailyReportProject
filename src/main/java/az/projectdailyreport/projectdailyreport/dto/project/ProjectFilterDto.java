@@ -1,6 +1,6 @@
 package az.projectdailyreport.projectdailyreport.dto.project;
 
-import az.projectdailyreport.projectdailyreport.dto.UserDTO;
+import az.projectdailyreport.projectdailyreport.dto.ProjectUserDto;
 import az.projectdailyreport.projectdailyreport.model.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,14 +13,11 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectFilter {
+public class ProjectFilterDto {
 
     private Long id;
     private Status status;
     private String projectName;
-    private List<UserDTO> users; // Assuming you have a UserDTO class
+    private List<ProjectUserDto> users; // Assuming you have a UserDTO class
 
-    private int totalPages;
-    private long totalElements;
-    private boolean hasNext;
 }

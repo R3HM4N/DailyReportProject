@@ -1,4 +1,4 @@
-package az.projectdailyreport.projectdailyreport.dto;
+package az.projectdailyreport.projectdailyreport.dto.dailyreport;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

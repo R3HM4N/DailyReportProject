@@ -5,8 +5,6 @@ import az.projectdailyreport.projectdailyreport.dto.request.CreateUserRequest;
 import az.projectdailyreport.projectdailyreport.model.Status;
 import az.projectdailyreport.projectdailyreport.model.User;
 import az.projectdailyreport.projectdailyreport.service.UserService;
-import az.projectdailyreport.projectdailyreport.unit.PageInfo;
-import az.projectdailyreport.projectdailyreport.unit.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,12 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final UserService userService;
+
+    @GetMapping
+    public ResponseEntity<List<UserGetAll>> getAllUsers() {
+        List<UserGetAll> users = userService.getAll();
+        return ResponseEntity.ok(users);
+    }
 
 
     @PostMapping("/create")

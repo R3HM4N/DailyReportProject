@@ -1,18 +1,11 @@
 package az.projectdailyreport.projectdailyreport.service.impl;
 
-import az.projectdailyreport.projectdailyreport.dto.project.ProjectDTO;
-import az.projectdailyreport.projectdailyreport.dto.project.ProjectGetDto;
-import az.projectdailyreport.projectdailyreport.dto.project.ProjectResponse;
-import az.projectdailyreport.projectdailyreport.dto.project.ProjectUpdateDto;
+import az.projectdailyreport.projectdailyreport.dto.ProjectUserDto;
+import az.projectdailyreport.projectdailyreport.dto.project.*;
 import az.projectdailyreport.projectdailyreport.dto.request.ProjectRequest;
-import az.projectdailyreport.projectdailyreport.exception.ProjectAlreadyDeletedException;
-import az.projectdailyreport.projectdailyreport.exception.ProjectExistsException;
-import az.projectdailyreport.projectdailyreport.exception.ProjectNotFoundException;
-import az.projectdailyreport.projectdailyreport.exception.UserNotFoundException;
-import az.projectdailyreport.projectdailyreport.model.Deleted;
-import az.projectdailyreport.projectdailyreport.model.Project;
-import az.projectdailyreport.projectdailyreport.model.Status;
-import az.projectdailyreport.projectdailyreport.model.User;
+import az.projectdailyreport.projectdailyreport.dto.team.TeamDTO;
+import az.projectdailyreport.projectdailyreport.exception.*;
+import az.projectdailyreport.projectdailyreport.model.*;
 import az.projectdailyreport.projectdailyreport.repository.ProjectRepository;
 import az.projectdailyreport.projectdailyreport.repository.UserRepository;
 import az.projectdailyreport.projectdailyreport.service.ProjectService;
@@ -20,6 +13,9 @@ import az.projectdailyreport.projectdailyreport.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -63,12 +59,14 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectGetDto> getAllProject() {
-     List<  Project> projects = projectRepository.findAll();
+        List<  Project> projects = projectRepository.findAll();
 
         return projects.stream()
                 .map(project -> {
                     ProjectGetDto projectGetDto = new ProjectGetDto();
                     projectGetDto.setProjectName(project.getProjectName());
+                    projectGetDto.setId(project.getId());
+
                     return projectGetDto;
                 })
                 .collect(Collectors.toList());
@@ -142,13 +140,17 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         if (userToRemove != null) {
-            project.getUsers().remove(userToRemove);
-            userToRemove.getProjects().remove(project);
+            if (!project.getUsers().remove(userToRemove) || !userToRemove.getProjects().remove(project)) {
+                // The user was not present in the project or the project was not present in the user's projects
+                throw new UserNotFoundException(userId);
+            }
             projectRepository.save(project);
+            // Log success or any additional information
         } else {
-            throw new UserNotFoundException(userId);
+            throw new UserAlreadyRemovedException(userId, projectId);
         }
     }
+
     @Override
     @Transactional
     public void addUserToProject(Long projectId, Long userId) {
@@ -158,10 +160,62 @@ public class ProjectServiceImpl implements ProjectService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
+        if (project.getUsers().contains(user) || user.getProjects().contains(project)) {
+            throw new UserAlreadyAddedException(userId, projectId);
+        }
+
         project.getUsers().add(user);
         user.getProjects().add(project);
         projectRepository.save(project);
     }
+
+
+    @Override
+    public Page<ProjectFilterDto> searchProjectsByName(String projectName, Pageable pageable) {
+        Page<Project> projects = projectRepository.findByProjectNameContainingIgnoreCase(projectName, pageable);
+        List<ProjectFilterDto> projectFilterDtos = mapToProjectFilterDtoList(projects.getContent());
+        return new PageImpl<>(projectFilterDtos, pageable, projects.getTotalElements());
+    }
+
+
+    private List<ProjectFilterDto> mapToProjectFilterDtoList(List<Project> projects) {
+        return projects.stream()
+                .map(this::mapToProjectFilterDto)
+                .collect(Collectors.toList());
+    }
+
+    private ProjectFilterDto mapToProjectFilterDto(Project project) {
+        return ProjectFilterDto.builder()
+                .id(project.getId())
+                .status(project.getStatus())
+                .projectName(project.getProjectName())
+                .users(mapToProjectUserDtoList(project.getUsers()))
+                .build();
+    }
+
+    private List<ProjectUserDto> mapToProjectUserDtoList(List<User> users) {
+        return users.stream()
+                .map(this::mapToProjectUserDto)
+                .collect(Collectors.toList());
+    }
+
+    private ProjectUserDto mapToProjectUserDto(User user) {
+        return ProjectUserDto.builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .status(user.getStatus())
+                .mail(user.getMail())
+                .team(user.getTeam() != null ? mapToTeamDto(user.getTeam()) : null)
+                .build();
+    }
+
+    private TeamDTO mapToTeamDto(Team team) {
+        return TeamDTO.builder()
+                .teamName(team.getTeamName())
+                .id(team.getId()).build();
+    }
+
 
 //    @Override
 //    public void hardDeleteProject(Long id) {

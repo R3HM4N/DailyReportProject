@@ -11,8 +11,9 @@ import java.util.Optional;
 public interface TeamService {
 
     List<Team> getAllTeams();
-//    TeamGetByIdDto getTeamById(Long teamId);
-void removeUserFromTeam(Long teamId, Long userId);
+    void deleteTeam(Long teamId);
+    //    TeamGetByIdDto getTeamById(Long teamId);
+    void removeUserFromTeam(Long teamId, Long userId);
     void addUserToTeam(Long teamId, Long userId);
     TeamGetByIdDto getById(Long id);
     Team updateTeam(Long teamId, TeamResponse updatedTeamDto);

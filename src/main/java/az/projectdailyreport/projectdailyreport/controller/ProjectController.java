@@ -1,14 +1,14 @@
 package az.projectdailyreport.projectdailyreport.controller;
 
-import az.projectdailyreport.projectdailyreport.dto.project.ProjectDTO;
-import az.projectdailyreport.projectdailyreport.dto.project.ProjectGetDto;
-import az.projectdailyreport.projectdailyreport.dto.project.ProjectResponse;
-import az.projectdailyreport.projectdailyreport.dto.project.ProjectUpdateDto;
+import az.projectdailyreport.projectdailyreport.dto.project.*;
 import az.projectdailyreport.projectdailyreport.dto.request.ProjectRequest;
 import az.projectdailyreport.projectdailyreport.model.Project;
 import az.projectdailyreport.projectdailyreport.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,8 +43,8 @@ public class ProjectController {
 
     @DeleteMapping("/soft/{id}")
     public ResponseEntity<String> softDeleteProject(@PathVariable Long id) {
-            projectService.softDeleteProject(id);
-            return ResponseEntity.ok("Project successfully SOFT Delete edildi.");
+        projectService.softDeleteProject(id);
+        return ResponseEntity.ok("Project successfully SOFT Delete edildi.");
     }
 
     @DeleteMapping("/{projectId}/users/{userId}")
@@ -57,6 +57,20 @@ public class ProjectController {
         projectService.addUserToProject(projectId, userId);
         return ResponseEntity.ok("User added to project successfully.");
     }
+    @GetMapping("/search")
+    public ResponseEntity<Page<ProjectFilterDto>> searchProjectsByName(
+            @RequestParam("name") String projectName,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ProjectFilterDto> filteredProjects = projectService.searchProjectsByName(projectName, pageable);
+        if (filteredProjects.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(filteredProjects);
+    }
+
 
     // Hard Delete
 //    @DeleteMapping("/hard/{id}")

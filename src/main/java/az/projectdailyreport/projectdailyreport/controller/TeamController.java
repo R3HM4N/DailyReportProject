@@ -38,7 +38,7 @@ public class TeamController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-}
+    }
     @PostMapping("/{teamId}/users/{userId}")
     public ResponseEntity<String> addUserToTeam(@PathVariable Long teamId, @PathVariable Long userId) {
         teamService.addUserToTeam(teamId, userId);
@@ -69,7 +69,15 @@ public class TeamController {
         ModelMapper modelMapper = new ModelMapper();
         return modelMapper.map(team, TeamDTO.class);
 
-}
+    }
+
+    @DeleteMapping("/{teamId}")
+    public ResponseEntity<String> deleteTeam(@PathVariable Long teamId) {
+        teamService.deleteTeam(teamId);
+        return new ResponseEntity<>("Team deleted successfully", HttpStatus.OK);
+
+
+    }
 
 
 }

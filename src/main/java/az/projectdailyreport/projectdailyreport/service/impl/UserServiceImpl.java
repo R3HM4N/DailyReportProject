@@ -37,6 +37,20 @@ public class UserServiceImpl implements UserService {
     private final TeamRepository teamRepository;
 //    private final ProjectRepository projectRepository;
 
+    @Override
+    public List<UserGetAll> getAll(){
+        List<User> userGetAlls = userRepository.findAll();
+        List< UserGetAll> us = userGetAlls.stream().map(user -> {
+            UserGetAll userGetAll =   UserGetAll.builder().id(user.getId())
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .mail(user.getMail()).build();
+            return userGetAll;
+
+        }).collect(Collectors.toList());
+        return us;
+    }
+
 
     @Override
     public User createUser(CreateUserRequest createUserRequest) {

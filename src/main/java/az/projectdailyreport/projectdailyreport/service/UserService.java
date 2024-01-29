@@ -13,6 +13,8 @@ import java.util.Set;
 
 public interface UserService {
     User createUser(CreateUserRequest createUserRequest);
+    List<UserGetAll> getAll();
+
     void softDeleteUser(Long userId);
     List<User> getUsersByIds(List<Long> userIds);
     UserDTO updateUser(Long userId, UserUpdateDTO updatedUserDTO);

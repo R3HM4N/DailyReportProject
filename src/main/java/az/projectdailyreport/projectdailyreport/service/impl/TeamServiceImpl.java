@@ -6,6 +6,7 @@ import az.projectdailyreport.projectdailyreport.dto.UserDTO;
 import az.projectdailyreport.projectdailyreport.dto.team.TeamGetByIdDto;
 import az.projectdailyreport.projectdailyreport.dto.team.TeamUserDto;
 import az.projectdailyreport.projectdailyreport.exception.TeamExistsException;
+import az.projectdailyreport.projectdailyreport.exception.TeamNotEmptyException;
 import az.projectdailyreport.projectdailyreport.exception.TeamNotFoundException;
 import az.projectdailyreport.projectdailyreport.exception.UserNotFoundException;
 import az.projectdailyreport.projectdailyreport.model.Status;
@@ -134,16 +135,23 @@ public class TeamServiceImpl implements TeamService {
 
         // Save the updated team
         return teamRepository.save(existingTeam);
+
+    }
+    @Override
+    @Transactional
+    public void deleteTeam(Long teamId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new TeamNotFoundException(teamId));
+
+        if (team.canBeDeleted()) {
+            teamRepository.delete(team);
+        } else {
+            throw new TeamNotEmptyException(teamId);
+        }
     }
 
 
-//    @Override
-//    public void deleteTeam(Long id) {
-//        teamRepository.findById(id)
-//                .orElseThrow(() -> new TeamNotFoundException(id));
-//
-//        teamRepository.deleteById(id);
-//    }
+
 
 //    @Override
 //    @Transactional

@@ -129,4 +129,37 @@ public class GeneralExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 exception.getMessage());
     }
+
+    @ExceptionHandler(UserAlreadyRemovedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionResponse handleUserAlreadyRemovedException  (UserAlreadyRemovedException   exception) {
+        return new ExceptionResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage());
+    }
+
+    @ExceptionHandler(UserAlreadyAddedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionResponse handleUserAlreadyAddedException  (UserAlreadyAddedException   exception) {
+        return new ExceptionResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage());
+    }
+
+    @ExceptionHandler(TeamNotEmptyException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public  ExceptionResponse handleTeamNotEmptyException (TeamNotEmptyException  exception){
+        return new ExceptionResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage());
+
+    }
+
+
 }

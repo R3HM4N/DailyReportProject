@@ -26,5 +26,10 @@ public class Team {
 
     private List<User> users;
 
+    public boolean canBeDeleted() {
+        return users == null || users.isEmpty();
+    }
+
+
 }
 
