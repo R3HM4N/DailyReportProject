@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class TeamController {
 
 
     @GetMapping("/get")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public List<Team> getAllTeams() {
         return teamService.getAllTeams();
     }
@@ -51,7 +53,7 @@ public class TeamController {
         teamService.removeUserFromTeam(teamId, userId);
         return ResponseEntity.ok("User successfully removed from the team.");
     }
-
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<Team> createTeam(@RequestBody TeamResponse teamDto) {
         Team createdTeam = teamService.createTeam(teamDto);

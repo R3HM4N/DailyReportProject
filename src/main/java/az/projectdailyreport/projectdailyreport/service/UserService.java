@@ -14,6 +14,7 @@ import java.util.Set;
 public interface UserService {
     User createUser(CreateUserRequest createUserRequest);
     List<UserGetAll> getAll();
+    User getSignedInUser();
 
     void softDeleteUser(Long userId);
     List<User> getUsersByIds(List<Long> userIds);

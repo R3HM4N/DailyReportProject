@@ -2,9 +2,13 @@ package az.projectdailyreport.projectdailyreport.service.impl;
 
 import az.projectdailyreport.projectdailyreport.dto.*;
 import az.projectdailyreport.projectdailyreport.dto.project.ProjectDTO;
+import az.projectdailyreport.projectdailyreport.dto.request.AuthenticationResponse;
 import az.projectdailyreport.projectdailyreport.dto.request.CreateUserRequest;
+import az.projectdailyreport.projectdailyreport.exception.MailAlreadyExistsException;
+import az.projectdailyreport.projectdailyreport.exception.SuperAdminException;
 import az.projectdailyreport.projectdailyreport.exception.TeamNotFoundException;
 import az.projectdailyreport.projectdailyreport.exception.UserNotFoundException;
+import az.projectdailyreport.projectdailyreport.model.RoleName;
 import az.projectdailyreport.projectdailyreport.model.Team;
 import az.projectdailyreport.projectdailyreport.model.User;
 import az.projectdailyreport.projectdailyreport.model.Status;
@@ -20,6 +24,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -31,7 +38,11 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
+    private final JwtService jwtService;
+    private final AuthenticationService authenticationService;
+
     //    private final ProjectService projectService;
 //    private final RoleRepository roleRepository;
     private final TeamRepository teamRepository;
@@ -40,10 +51,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserGetAll> getAll(){
         List<User> userGetAlls = userRepository.findAll();
+
         List< UserGetAll> us = userGetAlls.stream().map(user -> {
+            String fullName = user.getFirstName() + " " + user.getLastName();
+
             UserGetAll userGetAll =   UserGetAll.builder().id(user.getId())
-                    .firstName(user.getFirstName())
-                    .lastName(user.getLastName())
+                    .fullName(fullName)
                     .mail(user.getMail()).build();
             return userGetAll;
 
@@ -51,6 +64,15 @@ public class UserServiceImpl implements UserService {
         return us;
     }
 
+    public User getSignedInUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.isAuthenticated() && authentication.getPrincipal() instanceof User) {
+            return (User) authentication.getPrincipal();
+        } else {
+            throw new RuntimeException("User not found");
+        }
+    }
 
     @Override
     public User createUser(CreateUserRequest createUserRequest) {
@@ -58,10 +80,29 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setFirstName(createUserRequest.getFirstName());
         user.setLastName(createUserRequest.getLastName());
-        user.setPassword(createUserRequest.getPassword());
+        user.setPassword(passwordEncoder.encode(createUserRequest.getPassword()));
         user.setRole(createUserRequest.getRole());
         user.setStatus(Status.ACTIVE);
+
+        if (createUserRequest.getRole().getId()==2){
+            user.setRoleName(RoleName.ADMIN);
+        }
+        if (createUserRequest.getRole().getId()==3){
+            user.setRoleName(RoleName.HEAD);
+        }
+        if (createUserRequest.getRole().getId()==4){
+            user.setRoleName(RoleName.USER);
+        }
+        else {
+            throw new SuperAdminException("icaze yoxdur");
+        }
+
         user.setMail(createUserRequest.getMail());
+        boolean isMailExists = userRepository.existsByMail(createUserRequest.getMail());
+        if (isMailExists) {
+            throw new MailAlreadyExistsException("Email address already exists");
+        }
+
         if (createUserRequest.getTeamId()!=null){
 
             Team team =teamRepository.findById(createUserRequest.getTeamId())
@@ -71,9 +112,15 @@ public class UserServiceImpl implements UserService {
 
         }
 
-        // User'ı kaydet
+        var savedUser = userRepository.save(user);
+        var jwtToken = jwtService.createToken(user);
+        var refreshToken = jwtService.generateRefreshToken(user);
+
+        authenticationService.saveUserToken(savedUser, jwtToken);
         return userRepository.save(user);
+
     }
+
     @Override
     public List<User> getUsersByIds(List<Long> userIds) {
         List<User> userList = userRepository.findAllById(userIds);

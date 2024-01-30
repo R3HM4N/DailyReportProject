@@ -12,8 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserGetAll {
     private Long id;
-    private String firstName;
-    private String lastName;
+    private String fullName;
     private String mail;
 
 }

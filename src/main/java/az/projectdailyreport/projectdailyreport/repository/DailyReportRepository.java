@@ -23,14 +23,16 @@ public interface DailyReportRepository  extends JpaRepository<DailyReport,Long> 
     Optional<DailyReport> findByProjectAndUserAndLocalDateTimeBetween(Project project, User user, LocalDateTime start, LocalDateTime end);
 
     @Query("SELECT dr FROM DailyReport dr " +
-            "WHERE (:firstNames IS NULL OR dr.firstName IN :firstNames) " +
+            "WHERE (:userIds IS NULL OR dr.user.id IN :userIds) " +
             "AND ((:startDate IS NOT NULL AND :endDate IS NOT NULL AND DATE(dr.localDateTime) BETWEEN :startDate AND :endDate) " +
             "OR (:startDate IS NOT NULL AND :endDate IS NULL AND DATE(dr.localDateTime) >= :startDate) " +
-            "OR (:startDate IS NULL AND :endDate IS NOT NULL AND DATE(dr.localDateTime) <= :endDate))")
-    List<DailyReport> findByFirstNameInAndLocalDateTimeBetween(
-            @Param("firstNames") List<String> firstNames,
+            "OR (:startDate IS NULL AND :endDate IS NOT NULL AND DATE(dr.localDateTime) <= :endDate) " +
+            "AND (:projectIds IS NULL OR dr.project.id IN :projectIds))")
+    List<DailyReport> findByUserIdInAndLocalDateTimeBetweenAndProjectIdIn(
+            @Param("userIds") List<Long> userIds,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
+            @Param("projectIds") List<Long> projectIds,
             Pageable pageable
     );
     boolean existsByProjectAndUserAndLocalDateTimeBetween(Project project, User user, LocalDateTime start, LocalDateTime end);

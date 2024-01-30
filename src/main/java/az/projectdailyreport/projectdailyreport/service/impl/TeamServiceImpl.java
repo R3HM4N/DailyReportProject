@@ -19,6 +19,7 @@ import az.projectdailyreport.projectdailyreport.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,6 +38,7 @@ public class TeamServiceImpl implements TeamService {
 
 
     @Override
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public List<Team> getAllTeams() {
         return teamRepository.findAll();
     }
@@ -102,6 +104,8 @@ public class TeamServiceImpl implements TeamService {
         return dto;
     }
     @Override
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+
     public Team createTeam(TeamResponse teamDto) {
         String teamName = teamDto.getTeamName();
 

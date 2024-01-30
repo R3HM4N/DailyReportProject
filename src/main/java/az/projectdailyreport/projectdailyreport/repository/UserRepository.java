@@ -1,8 +1,6 @@
 package az.projectdailyreport.projectdailyreport.repository;
 
-import az.projectdailyreport.projectdailyreport.model.Project;
-import az.projectdailyreport.projectdailyreport.model.Status;
-import az.projectdailyreport.projectdailyreport.model.User;
+import az.projectdailyreport.projectdailyreport.model.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -20,9 +18,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query("UPDATE User u SET u.status = 'DELETED' WHERE u.id = :userId")
     void softDeleteUser(@Param("userId") Long userId);
+    boolean existsByRole(Role role);
+
 
     @EntityGraph(attributePaths = "projects")
     Optional<User> findById(Long id);
+
 
 
     //    @Query("SELECT DISTINCT u FROM User u JOIN u.projects p " +
@@ -49,6 +50,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.projects WHERE u.id = :userId")
     Optional<User> findByIdWithProjects(@Param("userId") Long userId);
+    @Query("SELECT u FROM User u WHERE u.mail = :email")
+    Optional<User> findByEmail(@Param("email") String email);
+    boolean existsByMail(String mail);
+
 
 
 

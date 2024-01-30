@@ -1,6 +1,6 @@
 package az.projectdailyreport.projectdailyreport.model;
 
-public enum RoleName {
+public enum     RoleName {
     SUPER_ADMIN,
     ADMIN,
     HEAD,

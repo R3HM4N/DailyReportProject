@@ -19,7 +19,7 @@ public interface DailyReportService {
      List<DailyReportUser> getAllDailyReportsForUser(Long id);
      List<DailyReportAdmin> getAllDailyReportsForAdmin();
      List<DailyReportUser> getUserReportsBetweenDates(Long userId, LocalDate startDate, LocalDate endDate, Pageable pageable);
-     List<DailyReportAdmin> getFilteredDailyReportsForAdmin(List<String> firstNames, LocalDate startDate, LocalDate endDate, Pageable pageable);
+     List<DailyReportAdmin> getFilteredDailyReportsForAdmin(List<Long> userIds, LocalDate startDate, LocalDate endDate, List<Long> projectIds, Pageable pageable);
      DailyReportDTO updateDailyReport(Long reportId, DailyReportUpdate updatedReportText);
 }
 

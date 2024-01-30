@@ -166,10 +166,11 @@ public class DailyReportServiceImpl implements DailyReportService {
     }
 
     @Override
-    public List<DailyReportAdmin> getFilteredDailyReportsForAdmin(List<String> firstNames, LocalDate startDate, LocalDate endDate, Pageable pageable) {
-        List<DailyReport> filteredReports = dailyReportRepository.findByFirstNameInAndLocalDateTimeBetween(firstNames, startDate, endDate, pageable);
+    public List<DailyReportAdmin> getFilteredDailyReportsForAdmin(List<Long> userIds, LocalDate startDate, LocalDate endDate, List<Long> projectIds, Pageable pageable) {
+        List<DailyReport> filteredReports = dailyReportRepository.findByUserIdInAndLocalDateTimeBetweenAndProjectIdIn(userIds, startDate, endDate, projectIds, pageable);
         return mapToAdminDTOList(filteredReports);
     }
+
     @Override
     public List<DailyReportUser> getUserReportsBetweenDates(Long userId, LocalDate startDate, LocalDate endDate, Pageable pageable) {
         List<DailyReport> filteredReports = dailyReportRepository.findUserReportsBetweenDates(userId, startDate, endDate, pageable);

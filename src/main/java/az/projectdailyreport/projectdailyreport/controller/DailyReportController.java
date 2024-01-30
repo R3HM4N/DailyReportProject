@@ -9,6 +9,7 @@ import az.projectdailyreport.projectdailyreport.model.DailyReport;
 import az.projectdailyreport.projectdailyreport.model.User;
 import az.projectdailyreport.projectdailyreport.repository.UserRepository;
 import az.projectdailyreport.projectdailyreport.service.DailyReportService;
+import az.projectdailyreport.projectdailyreport.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -32,13 +34,14 @@ public class DailyReportController {
 
     private final DailyReportService dailyReportService;
     private final UserRepository userRepository;
-    long a =1;
-    long b = 2;
+    private final UserService userService;
+
     @PostMapping("/reports")
     public ResponseEntity<DailyReportDTO> createDailyReport(@RequestBody DailyReportRequest reportRequest) {
-        Optional<User> userOptional = userRepository.findById(a);
 
-        //        User signedInUser = authenticationService.getSignedInUser();
+              User signedInUser = userService.getSignedInUser();
+        Optional<User> userOptional = userRepository.findById(signedInUser.getId());
+
 
         if (userOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -61,8 +64,8 @@ public class DailyReportController {
     @GetMapping("/user")
     public ResponseEntity<List<DailyReportUser>> getAllDailyReportsForUser() {
 
-        Optional<User> userOptional = userRepository.findById(b);
-
+        User signedInUser = userService.getSignedInUser();
+        Optional<User> userOptional = userRepository.findById(signedInUser.getId());
 
 
         List<DailyReportUser> dailyReportsForUser = dailyReportService.getAllDailyReportsForUser(userOptional.get().getId());
@@ -76,20 +79,21 @@ public class DailyReportController {
     }
     @GetMapping("/admin/filtir")
     public ResponseEntity<List<DailyReportAdmin>> getFilteredDailyReportsForAdmin(
-            @RequestParam(required = false) List<String> firstNames,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate endDate,
+            @RequestParam(required = false) List<Long> userIds,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) List<Long> projectIds,
             @RequestParam(name = "pageNumber", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer size,
             @RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
-            @RequestParam(name = "sortOrder", defaultValue = "ASC") String sortOrder    )
+            @RequestParam(name = "sortOrder", defaultValue = "ASC") String sortOrder) {
 
-    {
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(sortOrder), sortBy);
 
-        List<DailyReportAdmin> filteredReports = dailyReportService.getFilteredDailyReportsForAdmin(firstNames, startDate, endDate, pageable);
+        List<DailyReportAdmin> filteredReports = dailyReportService.getFilteredDailyReportsForAdmin(userIds, startDate, endDate, projectIds, pageable);
         return ResponseEntity.ok(filteredReports);
     }
+
 
     @GetMapping("/user/reports")
     public ResponseEntity<List<DailyReportUser>> getUserReportsBetweenDates(
@@ -103,8 +107,8 @@ public class DailyReportController {
     {
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(sortOrder), sortBy);
 
-        Optional<User> userOptional = userRepository.findById(a);
-
+        User signedInUser = userService.getSignedInUser();
+        Optional<User> userOptional = userRepository.findById(signedInUser.getId());
         List<DailyReportUser> reports = dailyReportService.getUserReportsBetweenDates(userOptional.get().getId(), startDate, endDate, pageable);
         return ResponseEntity.ok(reports);
     }
