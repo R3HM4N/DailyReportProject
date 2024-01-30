@@ -184,4 +184,16 @@ public class GeneralExceptionHandler {
 
     }
 
+
+    @ExceptionHandler(RoleException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public  ExceptionResponse handleRoleException (RoleException  exception){
+        return new ExceptionResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage());
+
+    }
+
 }

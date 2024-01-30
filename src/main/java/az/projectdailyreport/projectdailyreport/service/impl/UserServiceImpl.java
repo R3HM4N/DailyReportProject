@@ -4,10 +4,7 @@ import az.projectdailyreport.projectdailyreport.dto.*;
 import az.projectdailyreport.projectdailyreport.dto.project.ProjectDTO;
 import az.projectdailyreport.projectdailyreport.dto.request.AuthenticationResponse;
 import az.projectdailyreport.projectdailyreport.dto.request.CreateUserRequest;
-import az.projectdailyreport.projectdailyreport.exception.MailAlreadyExistsException;
-import az.projectdailyreport.projectdailyreport.exception.SuperAdminException;
-import az.projectdailyreport.projectdailyreport.exception.TeamNotFoundException;
-import az.projectdailyreport.projectdailyreport.exception.UserNotFoundException;
+import az.projectdailyreport.projectdailyreport.exception.*;
 import az.projectdailyreport.projectdailyreport.model.RoleName;
 import az.projectdailyreport.projectdailyreport.model.Team;
 import az.projectdailyreport.projectdailyreport.model.User;
@@ -76,6 +73,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(CreateUserRequest createUserRequest) {
+        User user1 =getSignedInUser();
+
         // CreateUserRequest'ten User entity'si oluştur
         User user = new User();
         user.setFirstName(createUserRequest.getFirstName());
@@ -84,18 +83,26 @@ public class UserServiceImpl implements UserService {
         user.setRole(createUserRequest.getRole());
         user.setStatus(Status.ACTIVE);
 
-        if (createUserRequest.getRole().getId()==2){
-            user.setRoleName(RoleName.ADMIN);
-        }
-        if (createUserRequest.getRole().getId()==3){
-            user.setRoleName(RoleName.HEAD);
-        }
-        if (createUserRequest.getRole().getId()==4){
-            user.setRoleName(RoleName.USER);
-        }
-        else {
-            throw new SuperAdminException("icaze yoxdur");
-        }
+            if (user1.getRoleName().equals(RoleName.ADMIN) && createUserRequest.getRole().getId() == 2) {
+                throw new RoleException("Admin kullanıcısı admin rolü oluşturamaz.");
+            }
+            if (user1.getRoleName().equals(RoleName.SUPER_ADMIN)) {
+                if (createUserRequest.getRole().getId() == 2) {
+                    user.setRoleName(RoleName.ADMIN);
+                } else if (createUserRequest.getRole().getId() == 3) {
+                    user.setRoleName(RoleName.HEAD);
+                } else if (createUserRequest.getRole().getId() == 4) {
+                    user.setRoleName(RoleName.USER);
+                }
+            } else if (user1.getRoleName().equals(RoleName.ADMIN)) {
+                if (createUserRequest.getRole().getId() == 3) {
+                    user.setRoleName(RoleName.HEAD);
+                } else if (createUserRequest.getRole().getId() == 4) {
+                    user.setRoleName(RoleName.USER);
+                }
+            }
+
+
 
         user.setMail(createUserRequest.getMail());
         boolean isMailExists = userRepository.existsByMail(createUserRequest.getMail());

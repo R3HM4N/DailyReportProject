@@ -1,5 +1,6 @@
 package az.projectdailyreport.projectdailyreport.service.impl;
 
+import az.projectdailyreport.projectdailyreport.model.RoleName;
 import az.projectdailyreport.projectdailyreport.model.User;
 import az.projectdailyreport.projectdailyreport.repository.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -59,11 +60,11 @@ public class JwtService {
         String email= user.getUsername();
        Optional< User> user1 = userRepository.findByEmail(email);
 
-        Enum roleName = user1.get().getRoleName();
+        RoleName roleName = user1.get().getRoleName();
         return Jwts.builder()
                 .setClaims(new HashMap<>())
                 .setSubject(user.getUsername())
-                .claim("role",roleName)
+                .claim("role", roleName.toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)

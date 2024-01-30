@@ -29,13 +29,11 @@ public class SecurityConfiguration {
                         auth.requestMatchers("api/v1/auth/**").permitAll()
 
                                 .requestMatchers(permitSwagger).permitAll()
-                                .requestMatchers("/users/**").hasRole("SUPER_ADMIN")
-                                .requestMatchers("/api/teams/get/**").hasRole("SUPER_ADMIN")
-                                .requestMatchers("/api/teams/**").hasRole("USER")
-                                .requestMatchers("/api/report/reports/**").hasRole("USER")
-
-//                                        .requestMatchers("/v1/user").hasRole("USER")
-//                                        .requestMatchers("/v1/admin").hasRole("ADMIN")
+                                .requestMatchers("/users/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
+                                .requestMatchers("/api/teams/get/**").hasAuthority("SUPER_ADMIN")
+                                .requestMatchers("/api/teams/**").hasAuthority("SUPER_ADMIN")
+                                .requestMatchers("/api/report/reports/**").hasAuthority("USER")
+                                .requestMatchers("/api/project/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
                                 .anyRequest().authenticated());
         http.authenticationProvider(authenticationProvider);
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
