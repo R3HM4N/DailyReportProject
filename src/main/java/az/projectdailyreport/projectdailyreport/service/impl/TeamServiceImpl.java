@@ -104,7 +104,6 @@ public class TeamServiceImpl implements TeamService {
         return dto;
     }
     @Override
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
 
     public Team createTeam(TeamResponse teamDto) {
         String teamName = teamDto.getTeamName();

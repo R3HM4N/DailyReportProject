@@ -4,6 +4,7 @@ import az.projectdailyreport.projectdailyreport.model.RoleName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,11 +30,22 @@ public class SecurityConfiguration {
                         auth.requestMatchers("api/v1/auth/**").permitAll()
 
                                 .requestMatchers(permitSwagger).permitAll()
-                                .requestMatchers("/users/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
-                                .requestMatchers("/api/teams/get/**").hasAuthority("SUPER_ADMIN")
-                                .requestMatchers("/api/teams/**").hasAuthority("SUPER_ADMIN")
-                                .requestMatchers("/api/report/reports/**").hasAuthority("USER")
-                                .requestMatchers("/api/project/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
+                                .requestMatchers(HttpMethod.GET,"/users/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD")
+                                .requestMatchers(HttpMethod.POST,"/users/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
+                                .requestMatchers(HttpMethod.DELETE,"/users/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
+                                .requestMatchers(HttpMethod.PUT,"/users/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
+
+                                .requestMatchers(HttpMethod.GET,"/api/teams/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD")
+                                .requestMatchers(HttpMethod.POST,"/api/teams/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
+                                .requestMatchers(HttpMethod.DELETE,"/api/teams/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
+                                .requestMatchers(HttpMethod.PUT,"/api/teams/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
+                                .requestMatchers(HttpMethod.GET,"/api/project/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD")
+                                .requestMatchers(HttpMethod.POST,"/api/project/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
+                                .requestMatchers(HttpMethod.DELETE,"/api/project/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
+                                .requestMatchers(HttpMethod.PUT,"/api/project/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
+                                .requestMatchers(HttpMethod.GET,"/api/report/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD","USER")
+                                .requestMatchers(HttpMethod.POST,"/api/report/**").hasAnyAuthority("USER")
+                                .requestMatchers(HttpMethod.PUT,"/api/report/**").hasAnyAuthority("USER")
                                 .anyRequest().authenticated());
         http.authenticationProvider(authenticationProvider);
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
