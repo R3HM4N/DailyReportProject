@@ -101,10 +101,16 @@ public class ProjectServiceImpl implements ProjectService {
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
     }
 
-    public Project updateProject(Long projectId, ProjectUpdateDto projectUpdateDto) {
-        Project existingProject = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ProjectNotFoundException( projectId));
 
+    public ProjectDTO convertToDto(Project project) {
+        ModelMapper modelMapper = new ModelMapper();
+        return modelMapper.map(project, ProjectDTO.class);
+    }
+    @Override
+    @Transactional
+    public Project updateProjectAndUsers(Long projectId, ProjectUpdateDto projectUpdateDto, List<Long> userIdsToAdd, List<Long> userIdsToRemove) {
+        Project existingProject = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
         String updatedProjectName = projectUpdateDto.getProjectName();
 
@@ -118,63 +124,52 @@ public class ProjectServiceImpl implements ProjectService {
         existingProject.setProjectName(updatedProjectName);
         // You can also update other fields if needed
 
+        // Add users to project
+        if (userIdsToAdd != null) {
+            for (Long userId : userIdsToAdd) {
+                User user = userRepository.findById(userId)
+                        .orElseThrow(() -> new UserNotFoundException(userId));
+
+                if (!existingProject.getUsers().contains(user) && !user.getProjects().contains(existingProject)) {
+                    existingProject.getUsers().add(user);
+                    user.getProjects().add(existingProject);
+                }
+            }
+        }
+
+        // Remove users from project
+        if (userIdsToRemove != null) {
+            for (Long userId : userIdsToRemove) {
+                User userToRemove = null;
+                for (User user : existingProject.getUsers()) {
+                    if (user.getId().equals(userId)) {
+                        userToRemove = user;
+                        break;
+                    }
+                }
+
+                if (userToRemove != null) {
+                    existingProject.getUsers().remove(userToRemove);
+                    userToRemove.getProjects().remove(existingProject);
+                }
+            }
+        }
+
         // Save the updated project
         return projectRepository.save(existingProject);
-    }
-    public ProjectDTO convertToDto(Project project) {
-        ModelMapper modelMapper = new ModelMapper();
-        return modelMapper.map(project, ProjectDTO.class);
-    }
-    @Override
-    @Transactional
-    public void removeUserFromProject(Long projectId, Long userId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ProjectNotFoundException(projectId));
-
-        User userToRemove = null;
-        for (User user : project.getUsers()) {
-            if (user.getId().equals(userId)) {
-                userToRemove = user;
-                break;
-            }
-        }
-
-        if (userToRemove != null) {
-            if (!project.getUsers().remove(userToRemove) || !userToRemove.getProjects().remove(project)) {
-                // The user was not present in the project or the project was not present in the user's projects
-                throw new UserNotFoundException(userId);
-            }
-            projectRepository.save(project);
-            // Log success or any additional information
-        } else {
-            throw new UserAlreadyRemovedException(userId, projectId);
-        }
-    }
-
-    @Override
-    @Transactional
-    public void addUserToProject(Long projectId, Long userId) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ProjectNotFoundException(projectId));
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
-
-        if (project.getUsers().contains(user) || user.getProjects().contains(project)) {
-            throw new UserAlreadyAddedException(userId, projectId);
-        }
-
-        project.getUsers().add(user);
-        user.getProjects().add(project);
-        projectRepository.save(project);
     }
 
 
     @Override
     public Page<ProjectFilterDto> searchProjectsByName(String projectName, Pageable pageable) {
-        Page<Project> projects = projectRepository.findByProjectNameContainingIgnoreCase(projectName, pageable);
+       if (projectName==null){
+           Page<Project> projectss = projectRepository.findAll(pageable);
+           List<ProjectFilterDto> projectFilterDtoss = mapToProjectFilterDtoList(projectss.getContent());
+           return new PageImpl<>(projectFilterDtoss,pageable,projectss.getTotalElements());
+       }
+       else{ Page<Project> projects = projectRepository.findByProjectNameContainingIgnoreCase(projectName, pageable);
         List<ProjectFilterDto> projectFilterDtos = mapToProjectFilterDtoList(projects.getContent());
-        return new PageImpl<>(projectFilterDtos, pageable, projects.getTotalElements());
+        return new PageImpl<>(projectFilterDtos, pageable, projects.getTotalElements());}
     }
 
 

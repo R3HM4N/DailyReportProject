@@ -32,13 +32,7 @@ public class ProjectController {
         return ResponseEntity.ok(projectResponse);
     }
 
-    @PutMapping("/{projectId}")
-    public ResponseEntity<ProjectDTO> updateProject(@PathVariable Long projectId,
-                                                    @RequestBody ProjectUpdateDto projectUpdateDto) {
-        Project updatedProject = projectService.updateProject(projectId, projectUpdateDto);
-        ProjectDTO responseDto = projectService.convertToDto(updatedProject);
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
-    }
+
 
 
     @DeleteMapping("/soft/{id}")
@@ -47,19 +41,17 @@ public class ProjectController {
         return ResponseEntity.ok("Project successfully SOFT Delete edildi.");
     }
 
-    @DeleteMapping("/{projectId}/users/{userId}")
-    public ResponseEntity<String> removeUserFromProject(@PathVariable Long projectId, @PathVariable Long userId) {
-        projectService.removeUserFromProject(projectId, userId);
-        return ResponseEntity.ok("User removed from project successfully.");
-    }
-    @PostMapping("/{projectId}/users/{userId}")
-    public ResponseEntity<String> addUserToProject(@PathVariable Long projectId, @PathVariable Long userId) {
-        projectService.addUserToProject(projectId, userId);
-        return ResponseEntity.ok("User added to project successfully.");
+    @PutMapping("/{projectId}")
+    public ResponseEntity<String> updateProjectAndUsers(@PathVariable Long projectId,
+                                                         @RequestBody ProjectUpdateDto projectUpdateDto,
+                                                         @RequestParam(required = false) List<Long> userIdsToAdd,
+                                                         @RequestParam(required = false) List<Long> userIdsToRemove) {
+        Project updatedProject = projectService.updateProjectAndUsers(projectId, projectUpdateDto, userIdsToAdd, userIdsToRemove);
+        return ResponseEntity.ok("Project successfully Updated .");
     }
     @GetMapping("/search")
     public ResponseEntity<Page<ProjectFilterDto>> searchProjectsByName(
-            @RequestParam("name") String projectName,
+            @RequestParam(value = "name",required = false) String projectName,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {

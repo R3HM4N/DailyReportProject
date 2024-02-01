@@ -3,6 +3,7 @@ package az.projectdailyreport.projectdailyreport.model;
 import az.projectdailyreport.projectdailyreport.validation.CrocusoftEmail;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
@@ -10,6 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -38,7 +40,7 @@ public class User implements UserDetails {
 
     private boolean deleted = false;
 
-    @CrocusoftEmail
+//    @CrocusoftEmail
     @Email(message = "Geçerli bir e-posta adresi değil")
     private String mail;
 
@@ -49,12 +51,19 @@ public class User implements UserDetails {
     @JoinColumn(name = "team_id")  // Bu alan, User'ın hangi Team'e ait olduğunu belirtir
     private Team team;
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "users", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "users",
+            cascade = {CascadeType.DETACH, CascadeType.MERGE,
+                    CascadeType.PERSIST, CascadeType.REFRESH})
+    @JsonBackReference
     List<Project> projects;
+    private String resetToken; // Şifre sıfırlama token'ı
+
+    private LocalDateTime resetTokenCreationTime;
 
 
 
-    @OneToMany(mappedBy = "user")
+
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
     private Set<DailyReport> dailyReports;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

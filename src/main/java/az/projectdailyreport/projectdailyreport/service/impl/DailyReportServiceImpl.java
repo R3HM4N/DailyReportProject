@@ -14,10 +14,8 @@ import az.projectdailyreport.projectdailyreport.model.DailyReport;
 import az.projectdailyreport.projectdailyreport.model.Project;
 import az.projectdailyreport.projectdailyreport.model.User;
 import az.projectdailyreport.projectdailyreport.repository.DailyReportRepository;
-import az.projectdailyreport.projectdailyreport.repository.UserRepository;
 import az.projectdailyreport.projectdailyreport.service.DailyReportService;
 import az.projectdailyreport.projectdailyreport.service.ProjectService;
-import az.projectdailyreport.projectdailyreport.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -29,7 +27,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -39,8 +36,8 @@ public class DailyReportServiceImpl implements DailyReportService {
 
 
     private final DailyReportRepository dailyReportRepository;
-    private final UserRepository userRepository;
-    private final UserService userService;
+
+
     private final ProjectService projectService;
     LocalDateTime startOfDay = LocalDateTime.now().with(LocalTime.MIN);
     LocalDateTime endOfDay = LocalDateTime.now().with(LocalTime.MAX);
@@ -54,7 +51,6 @@ public class DailyReportServiceImpl implements DailyReportService {
             throw new DuplicateReportException("Aynı projeye ve kullanıcıya ait rapor zaten mevcut.");
         }
 
-        // DailyReport'ı oluştur ve kaydet
         DailyReport dailyReport = new DailyReport();
         dailyReport.setFirstName(user.getFirstName());
         dailyReport.setLastName(user.getLastName());
@@ -66,46 +62,32 @@ public class DailyReportServiceImpl implements DailyReportService {
         dailyReport.setProject(project);
 
         DailyReport savedReport = dailyReportRepository.save(dailyReport);
-
         ModelMapper modelMapper = new ModelMapper();
-
 
         UserDTO userDTO = modelMapper.map(user, UserDTO.class);
         ProjectDTO projectDTO = modelMapper.map(project, ProjectDTO.class);
 
-        // DailyReportDTO'ya dönüştürme işlemi
-        DailyReportDTO dailyReportDTO = modelMapper.map(savedReport, DailyReportDTO.class);
-
-
-
-
-        return dailyReportDTO;
+        return   modelMapper.map(savedReport, DailyReportDTO.class);
     }
 
     @Override
     public DailyReportDTO updateDailyReport(Long reportId, DailyReportUpdate updatedReportText) {
-        // Belirli bir günlük raporunu id ile bul
         DailyReport existingReport = dailyReportRepository.findById(reportId)
                 .orElseThrow(() -> new ReportNotFoundException("Daily Report not found with id: " + reportId));
 
-        // Günün başlangıcı ve bitişi
         LocalDateTime startOfDay = LocalDateTime.now().with(LocalTime.MIN);
         LocalDateTime endOfDay = LocalDateTime.now().with(LocalTime.MAX);
 
-        // Eğer raporun kaydedildiği gün içinde bir güncelleme yapılmışsa hata fırlat
         if (!existingReport.getLocalDateTime().isAfter(startOfDay) ||
                 !existingReport.getLocalDateTime().isBefore(endOfDay)) {
             throw new DailyReportUpdateException("Günlük raporu sadece kaydedildiği gün içinde güncellenebilir.");
         }
 
-        // Sadece reportText alanını güncelle
         existingReport.setReportText(updatedReportText.getReportText());
 
         ModelMapper modelMapper =new ModelMapper();
-        // Güncellenmiş raporu kaydet
         DailyReport updatedReport = dailyReportRepository.save(existingReport);
 
-        // DTO'ya dönüştürme işlemi
         return modelMapper.map(updatedReport, DailyReportDTO.class);
     }
 
@@ -154,33 +136,32 @@ public class DailyReportServiceImpl implements DailyReportService {
                 .localDateTime(dailyReport.getLocalDateTime())
                 .reportText(dailyReport.getReportText())
                 .project(mapProjectToDTO(dailyReport.getProject()))
-                // Diğer alanlar
                 .build();
     }
     public ProjectDTO mapProjectToDTO(Project project) {
         return ProjectDTO.builder()
                 .id(project.getId())
                 .projectName(project.getProjectName())
-                // Diğer alanlar
                 .build();
     }
 
     @Override
-    public List<DailyReportAdmin> getFilteredDailyReportsForAdmin(List<Long> userIds, LocalDate startDate, LocalDate endDate, List<Long> projectIds, Pageable pageable) {
-        List<DailyReport> filteredReports = dailyReportRepository.findByUserIdInAndLocalDateTimeBetweenAndProjectIdIn(userIds, startDate, endDate, projectIds, pageable);
-        return mapToAdminDTOList(filteredReports);
-    }
+    public Page<DailyReportAdmin> getFilteredDailyReportsForAdmin(
+            List<Long> userIds, LocalDate startDate, LocalDate endDate,
+            List<Long> projectIds, Pageable pageable) {
 
+        if (userIds==null  && startDate==null && endDate==null && projectIds==null){
+            Page<DailyReport> getall = dailyReportRepository.findAll(pageable);
+            return getall.map(this::mapToAdminDTO);
+        }else {
+        Page<DailyReport> filteredReports = dailyReportRepository.findByUserIdInAndLocalDateTimeBetweenAndProjectIdIn(
+                userIds, startDate, endDate, projectIds, pageable);
+        return filteredReports.map(this::mapToAdminDTO);}
+    }
     @Override
     public List<DailyReportUser> getUserReportsBetweenDates(Long userId, LocalDate startDate, LocalDate endDate, Pageable pageable) {
         List<DailyReport> filteredReports = dailyReportRepository.findUserReportsBetweenDates(userId, startDate, endDate, pageable);
     return mapToUserDTOList(filteredReports);
     }
 
-
-
-
 }
-
-
-

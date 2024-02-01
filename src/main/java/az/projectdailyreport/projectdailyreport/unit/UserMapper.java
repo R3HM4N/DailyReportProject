@@ -11,6 +11,7 @@ import org.modelmapper.PropertyMap;
 import org.modelmapper.TypeToken;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -39,6 +40,7 @@ public class UserMapper {
     public static UserGetDTO toByDTO(User user) {
         return modelMapper.map(user, UserGetDTO.class);
     }
+
 
 
     @Bean

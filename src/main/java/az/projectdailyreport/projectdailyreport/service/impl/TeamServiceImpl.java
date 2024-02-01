@@ -42,41 +42,7 @@ public class TeamServiceImpl implements TeamService {
     public List<Team> getAllTeams() {
         return teamRepository.findAll();
     }
-    @Override
-    @Transactional
-    public void removeUserFromTeam(Long teamId, Long userId) {
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new TeamNotFoundException(teamId));
 
-        Optional<User> userOptional = team.getUsers().stream()
-                .filter(user -> user.getId().equals(userId))
-                .findFirst();
-
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            team.getUsers().remove(user);
-            user.setTeam(null); // Kullanıcının takım referansını temizleyin
-            userRepository.save(user); // Kullanıcıyı güncelleyin
-        } else {
-            throw new UserNotFoundException(userId);
-        }
-        teamRepository.save(team);
-    }
-
-    @Override
-    @Transactional
-    public void addUserToTeam(Long teamId, Long userId) {
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new TeamNotFoundException(teamId));
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
-
-        user.setTeam(team);
-        team.getUsers().add(user);
-
-        teamRepository.save(team);
-    }
     @Override
     public TeamGetByIdDto getById(Long id) {
         Team team = teamRepository.findById(id).orElse(null);
@@ -118,7 +84,8 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public Team updateTeam(Long teamId, TeamResponse updatedTeamDto) {
+    @Transactional
+    public TeamResponse updateTeamAndUsers(Long teamId, TeamResponse updatedTeamDto, List<Long> userIdsToAdd, List<Long> userIdsToRemove) {
         Team existingTeam = teamRepository.findById(teamId)
                 .orElseThrow(() -> new TeamNotFoundException(teamId));
 
@@ -136,9 +103,41 @@ public class TeamServiceImpl implements TeamService {
 
         // You can also update other fields if needed
 
-        // Save the updated team
-        return teamRepository.save(existingTeam);
+        // Update the team users
+        if (userIdsToAdd != null) {
+            for (Long userId : userIdsToAdd) {
+                User user = userRepository.findById(userId)
+                        .orElseThrow(() -> new UserNotFoundException(userId));
 
+                user.setTeam(existingTeam);
+                existingTeam.getUsers().add(user);
+            }
+        }
+
+        if (userIdsToRemove != null) {
+            for (Long userId : userIdsToRemove) {
+                Optional<User> userOptional = existingTeam.getUsers().stream()
+                        .filter(u -> u.getId().equals(userId))
+                        .findFirst();
+
+                if (userOptional.isPresent()) {
+                    User userToRemove = userOptional.get();
+                    existingTeam.getUsers().remove(userToRemove);
+                    userToRemove.setTeam(null);
+                    userRepository.save(userToRemove);
+                } else {
+                    // Kullanıcı bulunamadığında hata vermek yerine işlemi sessizce geç
+                    continue;
+                }
+            }
+        }
+
+        // Save the updated team
+        existingTeam = teamRepository.save(existingTeam);
+
+        // Map the updated team to TeamResponse
+        TeamResponse updatedTeamResponse = modelMapper.map(existingTeam, TeamResponse.class);
+        return updatedTeamResponse;
     }
     @Override
     @Transactional

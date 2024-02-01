@@ -4,6 +4,7 @@ import az.projectdailyreport.projectdailyreport.dto.*;
 import az.projectdailyreport.projectdailyreport.dto.project.ProjectDTO;
 import az.projectdailyreport.projectdailyreport.dto.request.AuthenticationResponse;
 import az.projectdailyreport.projectdailyreport.dto.request.CreateUserRequest;
+import az.projectdailyreport.projectdailyreport.dto.request.UserResetPasswordRequest;
 import az.projectdailyreport.projectdailyreport.exception.*;
 import az.projectdailyreport.projectdailyreport.model.RoleName;
 import az.projectdailyreport.projectdailyreport.model.Team;
@@ -12,7 +13,9 @@ import az.projectdailyreport.projectdailyreport.model.Status;
 import az.projectdailyreport.projectdailyreport.repository.TeamRepository;
 import az.projectdailyreport.projectdailyreport.repository.UserRepository;
 import az.projectdailyreport.projectdailyreport.service.UserService;
+import az.projectdailyreport.projectdailyreport.unit.EmailService;
 import az.projectdailyreport.projectdailyreport.unit.UserMapper;
+import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +29,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,6 +44,7 @@ public class UserServiceImpl implements UserService {
     private final ModelMapper modelMapper;
     private final JwtService jwtService;
     private final AuthenticationService authenticationService;
+    private final EmailService emailService;
 
     //    private final ProjectService projectService;
 //    private final RoleRepository roleRepository;
@@ -208,6 +214,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public String resetPassword(Long userId, UserReset userReset) {
+        Optional<User> userOptional = userRepository.findById(userId);
+
+        if (userOptional.isPresent() &&  userReset.getPassword().equals(userReset.getNewConfirimPassword())) {
+            User existingUser = userOptional.get();
+
+            // Yeni şifreyi şifreleyerek kaydetme
+            String encryptedPassword = passwordEncoder.encode(userReset.getPassword());
+            existingUser.setPassword(encryptedPassword);
+
+            // Şifre sıfırlama token'ını güncelleme
+            String resetToken = UUID.randomUUID().toString();
+            existingUser.setResetToken(resetToken);
+
+            userRepository.save(existingUser);
+
+            return "Şifre sıfırlama işlemi başarılı.";
+        } else {
+            // Kullanıcı bulunamadı, isteğe bağlı olarak bir hata yönetimi yapılabilir.
+            throw new EntityNotFoundException("User not found with id: " + userId);
+        }
+    }
+    @Override
     public void changeUserStatus(Long userId, Status newStatus) {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new UserNotFoundException( userId));
@@ -215,6 +244,93 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    @Override
+    public void changePassword(UserChangePassword changePassword) {
+        User user = getSignedInUser();
+
+        // Eski parolayı doğrula
+        if (passwordEncoder.matches(changePassword.getOldpassword(), user.getPassword()) && changePassword.getNewPassword().equals(changePassword.getNewConfirimPassword())) {
+            // Yeni parolayı doğrula
+                // Yeni parolayı şifrele ve kaydet
+                String encryptedPassword = passwordEncoder.encode(changePassword.getNewPassword());
+                user.setPassword(encryptedPassword);
+                userRepository.save(user);
+            } else {
+                throw new InvalidPasswordException("New passwords do not match OR Invalid password");
+            }
+        }
+
+    private String generateOtp() {
+        // Burada güvenli bir şekilde OTP oluşturulabilir (örneğin, Random sınıfı kullanılabilir)
+        // Bu örnek sadece basit bir şekilde 6 haneli bir OTP döndürüyor
+        Random random = new Random();
+        int otp = 100000 + random.nextInt(900000);
+        return String.valueOf(otp);
+
+    }
+
+
+    private void sendOtpByEmail(String email, String otp) {
+        String subject = "Password Reset OTP";
+        String message = "Your OTP for password reset is: " + otp;
+
+        try {
+            emailService.sendSimpleMessage(email, subject, message);
+        } catch (MessagingException e) {
+            // E-posta gönderimi başarısız olursa isteğe bağlı olarak bir hata yönetimi yapılabilir
+            throw new EmailNotSentException("Failed to send OTP via email");
+        }
+    }
+
+    @Override
+    public void sendPasswordResetEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserMailNotFoundExeption("User not found with email: " + email));
+
+        // Otp oluştur
+        String otp = generateOtp();
+
+        // Oluşturulan otp'yi kullanıcıya e-posta ile gönder
+        sendOtpByEmail(email, otp);
+
+        // Kullanıcının resetToken'ını güncelle
+        user.setResetToken(otp);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void resetPasswordWithOtp(UserResetPasswordRequest forgetDto) {
+        User user = userRepository.findByEmail(forgetDto.getEmail())
+                .orElseThrow(() -> new UserMailNotFoundExeption("User not found with email: " + forgetDto.getEmail()));
+
+        // Kullanıcının resetToken'ını kontrol et ve süresini kontrol et
+        if (forgetDto.getOtp().equals(user.getResetToken()) && isOtpValid(user.getResetTokenCreationTime())) {
+            if (forgetDto.getNewPassword().equals(forgetDto.getConfirmNewPassword())) {
+                // Yeni parolayı şifrele ve kaydet
+                String encryptedPassword = passwordEncoder.encode(forgetDto.getNewPassword());
+                user.setPassword(encryptedPassword);
+                user.setResetToken(null);  // Parola sıfırlama işlemi tamamlandığında token'ı temizle
+                userRepository.save(user);
+            }
+                throw new PasswordsNotMatchException("New password and confirm password do not match");
+
+        }
+             throw new InvalidOtpException("(New password and confirm password do not match) or Invalid or expired OTP");
+
+    }
+
+
+    private boolean isOtpValid(LocalDateTime creationTime) {
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        if (creationTime == null) {
+            return false;
+        }
+
+        long secondsElapsed = ChronoUnit.SECONDS.between(creationTime, currentTime);
+
+        return secondsElapsed <= 300;
+    }
 }
 
 

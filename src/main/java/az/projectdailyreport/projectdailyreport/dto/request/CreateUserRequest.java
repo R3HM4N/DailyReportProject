@@ -27,7 +27,7 @@ public class CreateUserRequest {
     private Role role;
 
 
-    @CrocusoftEmail
+//    @CrocusoftEmail
     @Email(message = "Geçerli bir e-posta adresi değil")
     private String mail;
 

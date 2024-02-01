@@ -21,6 +21,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByRole(Role role);
 
 
+
     @EntityGraph(attributePaths = "projects")
     Optional<User> findById(Long id);
 

@@ -196,4 +196,51 @@ public class GeneralExceptionHandler {
 
     }
 
+
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public  ExceptionResponse handleInvalidPasswordException (InvalidPasswordException  exception){
+        return new ExceptionResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage());
+
+    }
+
+    @ExceptionHandler(EmailNotSentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public  ExceptionResponse handleEmailNotSentException (EmailNotSentException  exception){
+        return new ExceptionResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage());
+
+    }
+
+    @ExceptionHandler(InvalidOtpException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public  ExceptionResponse handleInvalidOtpException (InvalidOtpException  exception){
+        return new ExceptionResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage());
+
+    }
+
+
+    @ExceptionHandler(PasswordsNotMatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public  ExceptionResponse handlePasswordsNotMatchException (PasswordsNotMatchException  exception){
+        return new ExceptionResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage());
+
+    }
+
 }

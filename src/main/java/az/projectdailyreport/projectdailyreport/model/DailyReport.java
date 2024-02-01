@@ -23,11 +23,11 @@ public class DailyReport {
     private LocalDateTime localDateTime;
     private String reportText;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "project_id")
     private Project project;
 }

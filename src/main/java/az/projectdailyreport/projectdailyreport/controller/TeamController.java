@@ -3,6 +3,8 @@ import az.projectdailyreport.projectdailyreport.dto.UserDTO;
 import az.projectdailyreport.projectdailyreport.dto.team.TeamDTO;
 import az.projectdailyreport.projectdailyreport.dto.TeamResponse;
 import az.projectdailyreport.projectdailyreport.dto.team.TeamGetByIdDto;
+import az.projectdailyreport.projectdailyreport.exception.TeamNotFoundException;
+import az.projectdailyreport.projectdailyreport.exception.UserNotFoundException;
 import az.projectdailyreport.projectdailyreport.model.Team;
 import az.projectdailyreport.projectdailyreport.service.TeamService;
 import lombok.RequiredArgsConstructor;
@@ -41,30 +43,22 @@ public class TeamController {
         }
 
     }
-    @PostMapping("/{teamId}/users/{userId}")
-    public ResponseEntity<String> addUserToTeam(@PathVariable Long teamId, @PathVariable Long userId) {
-        teamService.addUserToTeam(teamId, userId);
-        return ResponseEntity.ok("User successfully added to the team.");
-
+    @PutMapping("/{teamId}")
+    public ResponseEntity<TeamResponse> updateTeamAndUsers(
+            @PathVariable Long teamId,
+            @RequestBody TeamResponse teamResponse,
+            @RequestParam(required = false) List<Long> userIdsToAdd,
+            @RequestParam(required = false) List<Long> userIdsToRemove
+    ) {
+        TeamResponse updatedTeam = teamService.updateTeamAndUsers(teamId, teamResponse, userIdsToAdd, userIdsToRemove);
+        return ResponseEntity.ok(updatedTeam);
     }
 
-    @DeleteMapping("/{teamId}/users/{userId}")
-    public ResponseEntity<String> removeUserFromTeam(@PathVariable Long teamId, @PathVariable Long userId) {
-        teamService.removeUserFromTeam(teamId, userId);
-        return ResponseEntity.ok("User successfully removed from the team.");
-    }
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
+
     @PostMapping("/create")
     public ResponseEntity<Team> createTeam(@RequestBody TeamResponse teamDto) {
         Team createdTeam = teamService.createTeam(teamDto);
         return new ResponseEntity<>(createdTeam, HttpStatus.CREATED);
-    }
-    @PutMapping("/{teamId}")
-    public ResponseEntity<TeamDTO> updateTeam(@PathVariable Long teamId,
-                                              @RequestBody TeamResponse updatedTeamDto) {
-        Team updatedTeam = teamService.updateTeam(teamId, updatedTeamDto);
-        TeamDTO responseDto = convertToDto(updatedTeam);
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     private TeamDTO convertToDto(Team team) {

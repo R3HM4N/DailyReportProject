@@ -2,6 +2,7 @@ package az.projectdailyreport.projectdailyreport.controller;
 
 import az.projectdailyreport.projectdailyreport.dto.*;
 import az.projectdailyreport.projectdailyreport.dto.request.CreateUserRequest;
+import az.projectdailyreport.projectdailyreport.dto.request.UserResetPasswordRequest;
 import az.projectdailyreport.projectdailyreport.model.Status;
 import az.projectdailyreport.projectdailyreport.model.User;
 import az.projectdailyreport.projectdailyreport.service.UserService;
@@ -37,11 +38,7 @@ public class UserController {
         User createdUser = userService.createUser(createUserRequest);
         return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
-//    @DeleteMapping("/softdelete/{userId}")
-//    public ResponseEntity<String> softDeleteUser(@PathVariable Long userId) {
-//        userService.softDeleteUser(userId);
-//        return new ResponseEntity<>("User soft deleted successfully", HttpStatus.OK);
-//    }
+
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<String> softDeleteUser(@PathVariable Long userId) {
@@ -92,6 +89,33 @@ public class UserController {
     public ResponseEntity<String> changeUserStatus(@PathVariable Long userId, @RequestParam Status newStatus) {
         userService.changeUserStatus(userId, newStatus);
         return ResponseEntity.ok("User status has been updated successfully");
+    }
+    @PutMapping("/{userId}/reset-password")
+    public String resetPassword(@PathVariable Long userId, @RequestBody UserReset userReset) {
+        return userService.resetPassword(userId, userReset);
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(@RequestBody UserChangePassword changePassword) {
+
+            userService.changePassword(changePassword);
+            return ResponseEntity.ok("Password changed successfully");
+
+
+    }
+
+    @PostMapping("/forget-password-email")
+    public ResponseEntity<String> sendPasswordResetEmail(@RequestParam String email) {
+        userService.sendPasswordResetEmail(email);
+        return new ResponseEntity<>("Password reset email sent successfully", HttpStatus.OK);
+    }
+
+    @PostMapping("/forget-password-otp")
+    public ResponseEntity<String> resetPasswordWithOtp(@RequestBody UserResetPasswordRequest resetPasswordRequest) {
+
+
+        userService.resetPasswordWithOtp(resetPasswordRequest );
+        return new ResponseEntity<>("Password reset successfully", HttpStatus.OK);
     }
 
 }
