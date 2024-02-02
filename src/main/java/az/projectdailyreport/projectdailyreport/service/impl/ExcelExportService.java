@@ -1,49 +1,74 @@
 package az.projectdailyreport.projectdailyreport.service.impl;
 
-import az.projectdailyreport.projectdailyreport.dto.dailyreport.DailyReportAdmin;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import az.projectdailyreport.projectdailyreport.model.DailyReport;
+import az.projectdailyreport.projectdailyreport.repository.DailyReportRepository;
+
+
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.io.FileOutputStream;
+import jakarta.servlet.ServletOutputStream;
+
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-
 @Service
-
+@RequiredArgsConstructor
 public class ExcelExportService {
 
-    public void exportToExcel(List<DailyReportAdmin> reports, String filePath) throws IOException {
-        try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("FilteredReports");
+    private final DailyReportRepository dailyReportRepository;
 
-            // Header row
-            Row headerRow = sheet.createRow(0);
-            headerRow.createCell(0).setCellValue("ID");
-            headerRow.createCell(1).setCellValue("First Name");
-            headerRow.createCell(2).setCellValue("Last Name");
-            headerRow.createCell(3).setCellValue("Created Time");
-            headerRow.createCell(4).setCellValue("Daily Report");
-            // Diğer sütun başlıklarını ekleyin
+    public void generateDailyReportExcel(
+            HttpServletResponse httpServletResponse,
+            List<Long> userIds,
+            LocalDate startDate,
+            LocalDate endDate,
+            List<Long> projectIds,
+            Pageable pageable) throws IOException {
 
-            // Verileri yaz
-            int rowNum = 1;
-            for (DailyReportAdmin report : reports) {
-                Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(report.getId());
-                row.createCell(1).setCellValue(report.getFirstName());
-                row.createCell(2).setCellValue(report.getLastName());
-                row.createCell(3).setCellValue(report.getLocalDateTime());
-                row.createCell(4).setCellValue(report.getReportText());
-                // Diğer sütun değerlerini ekleyin
-            }
+        Page<DailyReport> reports = dailyReportRepository.findByUserIdInAndLocalDateTimeBetweenAndProjectIdIn(
+                userIds,
+                startDate,
+                endDate,
+                projectIds,
+                pageable
+        );
+        HSSFWorkbook hssfWorkbook = new HSSFWorkbook();
+        HSSFSheet sheet = hssfWorkbook.createSheet("Product with Variation Info");
+        HSSFRow row = sheet.createRow(0);
+        row.createCell(0).setCellValue("Daily Report ID");
+        row.createCell(1).setCellValue("UserId");
+        row.createCell(2).setCellValue("User FirstName");
+        row.createCell(3).setCellValue("User LastName");
+        row.createCell(4).setCellValue("LocalDate");
+        row.createCell(5).setCellValue("DailyReport Description");
+        row.createCell(6).setCellValue("ProjectName");
 
-            // Dosyayı kaydet
-            try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
-                workbook.write(fileOut);
-            }
+        int dataRowIndex = 1;
+
+        for (DailyReport report : reports) {
+            HSSFRow dataRow = sheet.createRow(dataRowIndex);
+            dataRow.createCell(0).setCellValue(report.getId());
+            dataRow.createCell(1).setCellValue(report.getUser().getId());
+            dataRow.createCell(2).setCellValue(report.getFirstName());
+            dataRow.createCell(3).setCellValue(report.getLastName());
+            dataRow.createCell(4).setCellValue(report.getLocalDateTime());
+            dataRow.createCell(5).setCellValue(report.getReportText());
+            dataRow.createCell(6).setCellValue(report.getProject().getProjectName());
+
+            dataRowIndex++;
         }
+
+        ServletOutputStream outputStream = httpServletResponse.getOutputStream();
+        hssfWorkbook.write(outputStream);
+        hssfWorkbook.close();
+        outputStream.close();
     }
 }

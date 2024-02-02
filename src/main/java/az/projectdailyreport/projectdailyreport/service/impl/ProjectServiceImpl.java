@@ -76,23 +76,23 @@ public class ProjectServiceImpl implements ProjectService {
     public List<Project> getProjectByIds(List <Long> projectId) {
         return projectRepository.findAllById(projectId);
     }
-    @Override
-    @Transactional
-    public void softDeleteProject(Long id) {
-        Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new ProjectNotFoundException(id));
-
-        if (Deleted.DELETED.equals(project.getStatus())) {
-            throw new ProjectAlreadyDeletedException(id);
-        }
-
-        // Yeniden soft delete denemesini kontrol et
-        if (projectRepository.existsByIdAndStatus(id, Deleted.DELETED)) {
-            throw new ProjectAlreadyDeletedException(id);
-        }
-
-        projectRepository.softDeleteProject(id);
-    }
+//    @Override
+//    @Transactional
+//    public void softDeleteProject(Long id) {
+//        Project project = projectRepository.findById(id)
+//                .orElseThrow(() -> new ProjectNotFoundException(id));
+//
+//        if (Deleted.DELETED.equals(project.getStatus())) {
+//            throw new ProjectAlreadyDeletedException(id);
+//        }
+//
+//        // Yeniden soft delete denemesini kontrol et
+//        if (projectRepository.existsByIdAndStatus(id, Deleted.DELETED)) {
+//            throw new ProjectAlreadyDeletedException(id);
+//        }
+//
+//        projectRepository.softDeleteProject(id);
+//    }
 
 
 

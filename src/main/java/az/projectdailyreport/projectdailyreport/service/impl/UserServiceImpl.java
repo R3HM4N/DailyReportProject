@@ -24,6 +24,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,12 +46,7 @@ public class UserServiceImpl implements UserService {
     private final JwtService jwtService;
     private final AuthenticationService authenticationService;
     private final EmailService emailService;
-
-    //    private final ProjectService projectService;
-//    private final RoleRepository roleRepository;
     private final TeamRepository teamRepository;
-//    private final ProjectRepository projectRepository;
-
     @Override
     public List<UserGetAll> getAll(){
         List<User> userGetAlls = userRepository.findAll();
@@ -80,8 +76,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public User createUser(CreateUserRequest createUserRequest) {
         User user1 =getSignedInUser();
-
-        // CreateUserRequest'ten User entity'si oluştur
         User user = new User();
         user.setFirstName(createUserRequest.getFirstName());
         user.setLastName(createUserRequest.getLastName());
@@ -89,8 +83,8 @@ public class UserServiceImpl implements UserService {
         user.setRole(createUserRequest.getRole());
         user.setStatus(Status.ACTIVE);
 
-            if (user1.getRoleName().equals(RoleName.ADMIN) && createUserRequest.getRole().getId() == 2) {
-                throw new RoleException("Admin kullanıcısı admin rolü oluşturamaz.");
+            if (user1.getRoleName().equals(RoleName.ADMIN) && (createUserRequest.getRole().getId() == 2 || createUserRequest.getRole().getId()==1) ) {
+                throw new RoleException("Yoou don't have access to create Admin and SuperAdmin.");
             }
             if (user1.getRoleName().equals(RoleName.SUPER_ADMIN)) {
                 if (createUserRequest.getRole().getId() == 2) {
@@ -107,8 +101,6 @@ public class UserServiceImpl implements UserService {
                     user.setRoleName(RoleName.USER);
                 }
             }
-
-
 
         user.setMail(createUserRequest.getMail());
         boolean isMailExists = userRepository.existsByMail(createUserRequest.getMail());
@@ -131,6 +123,7 @@ public class UserServiceImpl implements UserService {
 
         authenticationService.saveUserToken(savedUser, jwtToken);
         return userRepository.save(user);
+
 
     }
 
@@ -216,25 +209,25 @@ public class UserServiceImpl implements UserService {
     @Override
     public String resetPassword(Long userId, UserReset userReset) {
         Optional<User> userOptional = userRepository.findById(userId);
-
+        User user1 =getSignedInUser();
         if (userOptional.isPresent() &&  userReset.getPassword().equals(userReset.getNewConfirimPassword())) {
             User existingUser = userOptional.get();
-
-            // Yeni şifreyi şifreleyerek kaydetme
             String encryptedPassword = passwordEncoder.encode(userReset.getPassword());
             existingUser.setPassword(encryptedPassword);
-
-            // Şifre sıfırlama token'ını güncelleme
             String resetToken = UUID.randomUUID().toString();
             existingUser.setResetToken(resetToken);
+            if ((user1.getRoleName().equals(RoleName.ADMIN)) && userOptional.get().getRoleName().equals(RoleName.SUPER_ADMIN)||
+                    (user1.getRoleName().equals(RoleName.ADMIN) && !user1.getId().equals(userId))){
 
-            userRepository.save(existingUser);
+                throw new EntityNotFoundException("Password change failed: " + userId);
 
-            return "Şifre sıfırlama işlemi başarılı.";
-        } else {
-            // Kullanıcı bulunamadı, isteğe bağlı olarak bir hata yönetimi yapılabilir.
-            throw new EntityNotFoundException("User not found with id: " + userId);
+            }
+             else {
+                userRepository.save(existingUser);}
+             return "Şifre sıfırlama işlemi başarılı.";
+
         }
+        else  { throw new EntityNotFoundException("Password change failed: " + userId);}
     }
     @Override
     public void changeUserStatus(Long userId, Status newStatus) {
@@ -272,7 +265,8 @@ public class UserServiceImpl implements UserService {
 
     private void sendOtpByEmail(String email, String otp) {
         String subject = "Password Reset OTP";
-        String message = "Your OTP for password reset is: " + otp;
+        String message = "Şifrənizi yeniləmək üçün tələb göndərdiniz: \n Aşağıdakı koddan istifadə edərək şifrənizi yeniləyə bilərsiniz \n"
+                + otp + " \n Bu kodu başqa şəxslərlə paylaşmayın" + "\n Hər hansı bir çətinliyiniz olarsa sistem administratoru ilə əlaqə saxlamağınız tövsiyyə olunur." + "\n Hörmətlə, Crocusoft ";
 
         try {
             emailService.sendSimpleMessage(email, subject, message);

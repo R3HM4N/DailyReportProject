@@ -1,5 +1,4 @@
 package az.projectdailyreport.projectdailyreport.service.impl;
-
 import az.projectdailyreport.projectdailyreport.dto.dailyreport.DailyReportAdmin;
 import az.projectdailyreport.projectdailyreport.dto.dailyreport.DailyReportDTO;
 import az.projectdailyreport.projectdailyreport.dto.dailyreport.DailyReportUpdate;

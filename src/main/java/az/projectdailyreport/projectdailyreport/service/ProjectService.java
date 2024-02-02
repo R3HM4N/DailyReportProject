@@ -19,7 +19,7 @@ public interface ProjectService {
     Project getProjectById(Long projectId);
     List<Project> getProjectByIds(List <Long> projectId);
 
-    void softDeleteProject(Long id);
+//    void softDeleteProject(Long id);
 
 //    void hardDeleteProject(Long id);
 }

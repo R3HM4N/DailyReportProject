@@ -11,6 +11,8 @@ import az.projectdailyreport.projectdailyreport.repository.UserRepository;
 import az.projectdailyreport.projectdailyreport.service.DailyReportService;
 import az.projectdailyreport.projectdailyreport.service.UserService;
 import az.projectdailyreport.projectdailyreport.service.impl.ExcelExportService;
+import ch.qos.logback.core.model.Model;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
@@ -45,7 +47,7 @@ public class DailyReportController {
     private final DailyReportService dailyReportService;
     private final UserRepository userRepository;
     private final UserService userService;
-    private final ExcelExportService excelService;
+    private final ExcelExportService excelExportService;
 
     @PostMapping("/reports")
     public ResponseEntity<DailyReportDTO> createDailyReport(@RequestBody DailyReportRequest reportRequest) {
@@ -88,23 +90,6 @@ public class DailyReportController {
         List<DailyReportAdmin> dailyReportsForAdmin = dailyReportService.getAllDailyReportsForAdmin();
         return ResponseEntity.ok(dailyReportsForAdmin);
     }
-    @GetMapping("/admin/filtir")
-    public ResponseEntity<Page<DailyReportAdmin>> getFilteredDailyReportsForAdmin(
-            @RequestParam(required = false) List<Long> userIds,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(required = false) List<Long> projectIds,
-            @RequestParam(name = "pageNumber", defaultValue = "0") Integer page,
-            @RequestParam(name = "pageSize", defaultValue = "10") Integer size,
-            @RequestParam(name = "sortBy", defaultValue = "id", required = false) String sortBy,
-            @RequestParam(name = "sortOrder", defaultValue = "ASC") String sortOrder) {
-
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(sortOrder), sortBy);
-
-        Page<DailyReportAdmin> filteredReports = dailyReportService.getFilteredDailyReportsForAdmin(userIds, startDate, endDate, projectIds, pageable);
-        return ResponseEntity.ok(filteredReports);
-    }
-
 
     @GetMapping("/user/reports")
     public ResponseEntity<List<DailyReportUser>> getUserReportsBetweenDates(
@@ -124,33 +109,48 @@ public class DailyReportController {
         return ResponseEntity.ok(reports);
     }
 
-    @GetMapping("/export")
-    public ResponseEntity<String> exportFilteredReportsToExcel(
+    @GetMapping("/admin/filtir")
+    public ResponseEntity<Page<DailyReportAdmin>> getFilteredDailyReportsForAdmin(
             @RequestParam(required = false) List<Long> userIds,
-            @RequestParam(required = false) LocalDate startDate,
-            @RequestParam(required = false) LocalDate endDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) List<Long> projectIds,
             @RequestParam(name = "pageNumber", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer size,
             @RequestParam(name = "sortBy", defaultValue = "id", required = false) String sortBy,
             @RequestParam(name = "sortOrder", defaultValue = "ASC") String sortOrder) {
 
-        try {
-            Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(sortOrder), sortBy);
-            Page<DailyReportAdmin> filteredReportsPage = dailyReportService.getFilteredDailyReportsForAdmin(userIds, startDate, endDate, projectIds, pageable);
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(sortOrder), sortBy);
 
-            // Page içindeki liste
-            List<DailyReportAdmin> filteredReportsList = filteredReportsPage.getContent();
-
-            excelService.exportToExcel(filteredReportsList, "path/to/exportedReports.xlsx");
-            return ResponseEntity.ok("Excel export successful");
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Error exporting Excel");
-        }
+        Page<DailyReportAdmin> filteredReports = dailyReportService.getFilteredDailyReportsForAdmin(userIds, startDate, endDate, projectIds, pageable);
+        return ResponseEntity.ok(filteredReports);
     }
 
+
+
+
+    @GetMapping("/export-excel")
+    public void exportDailyReportsToExcel(HttpServletResponse response,
+                                          @RequestParam(required = false) List<Long> userIds,
+                                          @RequestParam(required = false) LocalDate startDate,
+                                          @RequestParam(required = false) LocalDate endDate,
+                                          @RequestParam(required = false) List<Long> projectIds,
+                                          @RequestParam(name = "pageNumber", defaultValue = "0") Integer page,
+                                          @RequestParam(name = "pageSize", defaultValue = "10") Integer size,
+                                          @RequestParam(name = "sortBy", defaultValue = "id", required = false) String sortBy,
+                                          @RequestParam(name = "sortOrder", defaultValue = "ASC") String sortOrder
+                                           ) throws IOException {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(sortOrder), sortBy);
+
+        response.setContentType("application/vnd.ms-excel");
+        response.setHeader("Content-Disposition", "attachment; filename=daily-reports.xlsx");
+
+        excelExportService.generateDailyReportExcel(response, userIds, startDate, endDate, projectIds, pageable);
+    }
 }
+
+
 
 
 

@@ -42,8 +42,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     //            Pageable pageable
     //    );
     @Query("SELECT u FROM User u " +
-            "WHERE (:firstName IS NULL OR u.firstName LIKE %:firstName%) " +
-            "AND (:lastName IS NULL OR u.lastName LIKE %:lastName%)" +
+            "WHERE u.deleted = false " + // Exclude deleted users
+            "AND (:firstName IS NULL OR u.firstName LIKE %:firstName%) " +
+            "AND (:lastName IS NULL OR u.lastName LIKE %:lastName%) " +
             "AND (:status IS NULL OR u.status = :status) " +
             "AND (:teamIds IS NULL OR u.team.id IN :teamIds) " +
             "AND (:projectIds IS NULL OR EXISTS (SELECT p FROM u.projects p WHERE p.id IN :projectIds))")

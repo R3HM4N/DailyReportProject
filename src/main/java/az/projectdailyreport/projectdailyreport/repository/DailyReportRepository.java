@@ -27,10 +27,6 @@ public interface DailyReportRepository  extends JpaRepository<DailyReport,Long> 
             "" +
             "" +
             "" +
-//            "AND ((:startDate IS NOT NULL AND :endDate IS NOT NULL AND DATE(dr.localDateTime) BETWEEN :startDate AND :endDate) " +
-//            "OR (:startDate IS NOT NULL AND :endDate IS NULL AND DATE(dr.localDateTime) >= :startDate) " +
-//            "OR (:startDate IS NULL AND :endDate IS  NULL AND DATE(dr.localDateTime) <= :endDate)) "
-
             "AND (((:startDate IS NULL OR DATE(dr.localDateTime) >= :startDate)" +
             " AND (:endDate IS NULL OR DATE(dr.localDateTime) <= :startDate))" +
             "   OR DATE(dr.localDateTime) BETWEEN :startDate AND :endDate ) " +

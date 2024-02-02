@@ -38,7 +38,6 @@ public class TeamServiceImpl implements TeamService {
 
 
     @Override
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public List<Team> getAllTeams() {
         return teamRepository.findAll();
     }

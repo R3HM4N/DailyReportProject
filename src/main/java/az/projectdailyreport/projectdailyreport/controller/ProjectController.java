@@ -35,11 +35,11 @@ public class ProjectController {
 
 
 
-    @DeleteMapping("/soft/{id}")
-    public ResponseEntity<String> softDeleteProject(@PathVariable Long id) {
-        projectService.softDeleteProject(id);
-        return ResponseEntity.ok("Project successfully SOFT Delete edildi.");
-    }
+//    @DeleteMapping("/soft/{id}")
+//    public ResponseEntity<String> softDeleteProject(@PathVariable Long id) {
+//        projectService.softDeleteProject(id);
+//        return ResponseEntity.ok("Project successfully SOFT Delete edildi.");
+//    }
 
     @PutMapping("/{projectId}")
     public ResponseEntity<String> updateProjectAndUsers(@PathVariable Long projectId,
