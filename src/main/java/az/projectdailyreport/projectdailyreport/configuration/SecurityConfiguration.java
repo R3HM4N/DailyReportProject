@@ -36,6 +36,7 @@ public class SecurityConfiguration {
 //                                .requestMatchers("/api/report/**").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/users/forget-password-otp").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/users/forget-password-email").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/users/confirm-password").permitAll()
                                 .requestMatchers(HttpMethod.GET,"/users/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD")
                                 .requestMatchers(HttpMethod.POST,"/users/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
                                 .requestMatchers(HttpMethod.DELETE,"/users/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")

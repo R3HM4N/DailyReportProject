@@ -1,9 +1,6 @@
 package az.projectdailyreport.projectdailyreport.model;
-
-import az.projectdailyreport.projectdailyreport.validation.CrocusoftEmail;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
@@ -13,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -22,7 +18,6 @@ import java.util.Set;
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
-@Getter
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,6 +35,9 @@ public class User implements UserDetails {
 
     private boolean deleted = false;
 
+    @Column(name = "is_change", nullable = false)
+    private boolean change = false;
+
 //    @CrocusoftEmail
     @Email(message = "Geçerli bir e-posta adresi değil")
     private String mail;
@@ -48,7 +46,8 @@ public class User implements UserDetails {
     private RoleName roleName;
 
     @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
-    @JoinColumn(name = "team_id")  // Bu alan, User'ın hangi Team'e ait olduğunu belirtir
+    @JoinColumn(name = "team_id")
+    @JsonIgnore
     private Team team;
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "users",

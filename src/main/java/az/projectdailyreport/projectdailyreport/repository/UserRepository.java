@@ -19,6 +19,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("UPDATE User u SET u.status = 'DELETED' WHERE u.id = :userId")
     void softDeleteUser(@Param("userId") Long userId);
     boolean existsByRole(Role role);
+   Optional< User>  findByResetToken(String resetToken);
+
+    Optional<User> findByChangeIsTrue();
+
 
 
 

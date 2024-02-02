@@ -22,8 +22,7 @@ public class Team {
     private String teamName;
 
     @OneToMany(mappedBy = "team", fetch = FetchType.EAGER,cascade = CascadeType.ALL)
-    @JsonBackReference
-
+    @JsonIgnore
     private List<User> users;
 
     public boolean canBeDeleted() {

@@ -1,6 +1,7 @@
 package az.projectdailyreport.projectdailyreport.controller;
 
 import az.projectdailyreport.projectdailyreport.dto.*;
+import az.projectdailyreport.projectdailyreport.dto.request.ConfirmPassword;
 import az.projectdailyreport.projectdailyreport.dto.request.CreateUserRequest;
 import az.projectdailyreport.projectdailyreport.dto.request.UserResetPasswordRequest;
 import az.projectdailyreport.projectdailyreport.model.Status;
@@ -105,17 +106,22 @@ public class UserController {
     }
 
     @PostMapping("/forget-password-email")
-    public ResponseEntity<String> sendPasswordResetEmail(@RequestParam String email) {
+    public ResponseEntity<String> forgetSendPasswordResetEmail(@RequestParam String email) {
         userService.sendPasswordResetEmail(email);
         return new ResponseEntity<>("Password reset email sent successfully", HttpStatus.OK);
     }
 
     @PostMapping("/forget-password-otp")
-    public ResponseEntity<String> resetPasswordWithOtp(@RequestBody UserResetPasswordRequest resetPasswordRequest) {
-
-
+    public ResponseEntity<String> forgetResetPasswordWithOtp(
+            @RequestBody UserResetPasswordRequest resetPasswordRequest) {
         userService.resetPasswordWithOtp(resetPasswordRequest );
-        return new ResponseEntity<>("Password reset successfully", HttpStatus.OK);
+        return new ResponseEntity<>("Otp code correct", HttpStatus.OK);
     }
+    @PostMapping("/confirm-password")
+    public void confirmPassword(@RequestBody ConfirmPassword confirmPassword) {
+        userService.confirmPassword(confirmPassword);
+    }
+
+
 
 }

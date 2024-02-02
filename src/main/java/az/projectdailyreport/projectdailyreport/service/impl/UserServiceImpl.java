@@ -3,6 +3,7 @@ package az.projectdailyreport.projectdailyreport.service.impl;
 import az.projectdailyreport.projectdailyreport.dto.*;
 import az.projectdailyreport.projectdailyreport.dto.project.ProjectDTO;
 import az.projectdailyreport.projectdailyreport.dto.request.AuthenticationResponse;
+import az.projectdailyreport.projectdailyreport.dto.request.ConfirmPassword;
 import az.projectdailyreport.projectdailyreport.dto.request.CreateUserRequest;
 import az.projectdailyreport.projectdailyreport.dto.request.UserResetPasswordRequest;
 import az.projectdailyreport.projectdailyreport.exception.*;
@@ -47,14 +48,15 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationService authenticationService;
     private final EmailService emailService;
     private final TeamRepository teamRepository;
+
     @Override
-    public List<UserGetAll> getAll(){
+    public List<UserGetAll> getAll() {
         List<User> userGetAlls = userRepository.findAll();
 
-        List< UserGetAll> us = userGetAlls.stream().map(user -> {
+        List<UserGetAll> us = userGetAlls.stream().map(user -> {
             String fullName = user.getFirstName() + " " + user.getLastName();
 
-            UserGetAll userGetAll =   UserGetAll.builder().id(user.getId())
+            UserGetAll userGetAll = UserGetAll.builder().id(user.getId())
                     .fullName(fullName)
                     .mail(user.getMail()).build();
             return userGetAll;
@@ -75,7 +77,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(CreateUserRequest createUserRequest) {
-        User user1 =getSignedInUser();
+        User user1 = getSignedInUser();
         User user = new User();
         user.setFirstName(createUserRequest.getFirstName());
         user.setLastName(createUserRequest.getLastName());
@@ -83,24 +85,24 @@ public class UserServiceImpl implements UserService {
         user.setRole(createUserRequest.getRole());
         user.setStatus(Status.ACTIVE);
 
-            if (user1.getRoleName().equals(RoleName.ADMIN) && (createUserRequest.getRole().getId() == 2 || createUserRequest.getRole().getId()==1) ) {
-                throw new RoleException("Yoou don't have access to create Admin and SuperAdmin.");
+        if (user1.getRoleName().equals(RoleName.ADMIN) && (createUserRequest.getRole().getId() == 2 || createUserRequest.getRole().getId() == 1)) {
+            throw new RoleException("Yoou don't have access to create Admin and SuperAdmin.");
+        }
+        if (user1.getRoleName().equals(RoleName.SUPER_ADMIN)) {
+            if (createUserRequest.getRole().getId() == 2) {
+                user.setRoleName(RoleName.ADMIN);
+            } else if (createUserRequest.getRole().getId() == 3) {
+                user.setRoleName(RoleName.HEAD);
+            } else if (createUserRequest.getRole().getId() == 4) {
+                user.setRoleName(RoleName.USER);
             }
-            if (user1.getRoleName().equals(RoleName.SUPER_ADMIN)) {
-                if (createUserRequest.getRole().getId() == 2) {
-                    user.setRoleName(RoleName.ADMIN);
-                } else if (createUserRequest.getRole().getId() == 3) {
-                    user.setRoleName(RoleName.HEAD);
-                } else if (createUserRequest.getRole().getId() == 4) {
-                    user.setRoleName(RoleName.USER);
-                }
-            } else if (user1.getRoleName().equals(RoleName.ADMIN)) {
-                if (createUserRequest.getRole().getId() == 3) {
-                    user.setRoleName(RoleName.HEAD);
-                } else if (createUserRequest.getRole().getId() == 4) {
-                    user.setRoleName(RoleName.USER);
-                }
+        } else if (user1.getRoleName().equals(RoleName.ADMIN)) {
+            if (createUserRequest.getRole().getId() == 3) {
+                user.setRoleName(RoleName.HEAD);
+            } else if (createUserRequest.getRole().getId() == 4) {
+                user.setRoleName(RoleName.USER);
             }
+        }
 
         user.setMail(createUserRequest.getMail());
         boolean isMailExists = userRepository.existsByMail(createUserRequest.getMail());
@@ -108,9 +110,9 @@ public class UserServiceImpl implements UserService {
             throw new MailAlreadyExistsException("Email address already exists");
         }
 
-        if (createUserRequest.getTeamId()!=null){
+        if (createUserRequest.getTeamId() != null) {
 
-            Team team =teamRepository.findById(createUserRequest.getTeamId())
+            Team team = teamRepository.findById(createUserRequest.getTeamId())
                     .orElseThrow(() -> new TeamNotFoundException(createUserRequest.getTeamId()));
 
             user.setTeam(team);
@@ -130,7 +132,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getUsersByIds(List<Long> userIds) {
         List<User> userList = userRepository.findAllById(userIds);
-        return  userList;}
+        return userList;
+    }
 
     @Override
     @Transactional
@@ -147,7 +150,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserDTO> getUsersByFilters(String firstName, String lastName, Status status,List< Long> teamId, List<Long> projectIds, Pageable pageable) {        // UserRepository'den sayfalama ile kullanıcıları alma
+    public Page<UserDTO> getUsersByFilters(String firstName, String lastName, Status status, List<Long> teamId, List<Long> projectIds, Pageable pageable) {        // UserRepository'den sayfalama ile kullanıcıları alma
         Page<User> usersPage = userRepository.findByFilters(firstName, lastName, status, teamId, projectIds, pageable);
         List<UserDTO> userDTOList = usersPage.getContent()
                 .stream()
@@ -157,6 +160,7 @@ public class UserServiceImpl implements UserService {
         // UserDTO listesini kullanarak yeni bir Page oluşturma
         return new PageImpl<>(userDTOList, pageable, usersPage.getTotalElements());
     }
+
     @Override
     @Transactional
     public UserGetDTO getUserById(Long userId) {
@@ -190,9 +194,6 @@ public class UserServiceImpl implements UserService {
 
         if (userOptional.isPresent()) {
             User existingUser = userOptional.get();
-
-
-            // ModelMapper kullanarak alanları eşleme
             modelMapper.map(updatedUserDTO, existingUser);
             existingUser.getTeam().setId(updatedUserDTO.getTeam().getId());
             existingUser.getTeam().setTeamName(updatedUserDTO.getTeam().getTeamName());
@@ -201,7 +202,6 @@ public class UserServiceImpl implements UserService {
 
             return UserMapper.toDTO(existingUser);
         } else {
-            // Kullanıcı bulunamadı, isteğe bağlı olarak bir hata yönetimi yapılabilir.
             throw new EntityNotFoundException("User not found with id: " + userId);
         }
     }
@@ -209,30 +209,32 @@ public class UserServiceImpl implements UserService {
     @Override
     public String resetPassword(Long userId, UserReset userReset) {
         Optional<User> userOptional = userRepository.findById(userId);
-        User user1 =getSignedInUser();
-        if (userOptional.isPresent() &&  userReset.getPassword().equals(userReset.getNewConfirimPassword())) {
+        User user1 = getSignedInUser();
+        if (userOptional.isPresent() && userReset.getPassword().equals(userReset.getNewConfirimPassword())) {
             User existingUser = userOptional.get();
             String encryptedPassword = passwordEncoder.encode(userReset.getPassword());
             existingUser.setPassword(encryptedPassword);
             String resetToken = UUID.randomUUID().toString();
             existingUser.setResetToken(resetToken);
-            if ((user1.getRoleName().equals(RoleName.ADMIN)) && userOptional.get().getRoleName().equals(RoleName.SUPER_ADMIN)||
-                    (user1.getRoleName().equals(RoleName.ADMIN) && !user1.getId().equals(userId))){
+            if ((user1.getRoleName().equals(RoleName.ADMIN)) && userOptional.get().getRoleName().equals(RoleName.SUPER_ADMIN) ||
+                    (user1.getRoleName().equals(RoleName.ADMIN) && !user1.getId().equals(userId))) {
 
                 throw new EntityNotFoundException("Password change failed: " + userId);
 
+            } else {
+                userRepository.save(existingUser);
             }
-             else {
-                userRepository.save(existingUser);}
-             return "Şifre sıfırlama işlemi başarılı.";
+            return "Şifre sıfırlama işlemi başarılı.";
 
+        } else {
+            throw new EntityNotFoundException("Password change failed: " + userId);
         }
-        else  { throw new EntityNotFoundException("Password change failed: " + userId);}
     }
+
     @Override
     public void changeUserStatus(Long userId, Status newStatus) {
         User user = userRepository.findById(userId).orElseThrow(() ->
-                new UserNotFoundException( userId));
+                new UserNotFoundException(userId));
         user.setStatus(newStatus);
         userRepository.save(user);
     }
@@ -241,21 +243,16 @@ public class UserServiceImpl implements UserService {
     public void changePassword(UserChangePassword changePassword) {
         User user = getSignedInUser();
 
-        // Eski parolayı doğrula
         if (passwordEncoder.matches(changePassword.getOldpassword(), user.getPassword()) && changePassword.getNewPassword().equals(changePassword.getNewConfirimPassword())) {
-            // Yeni parolayı doğrula
-                // Yeni parolayı şifrele ve kaydet
-                String encryptedPassword = passwordEncoder.encode(changePassword.getNewPassword());
-                user.setPassword(encryptedPassword);
-                userRepository.save(user);
-            } else {
-                throw new InvalidPasswordException("New passwords do not match OR Invalid password");
-            }
+            String encryptedPassword = passwordEncoder.encode(changePassword.getNewPassword());
+            user.setPassword(encryptedPassword);
+            userRepository.save(user);
+        } else {
+            throw new InvalidPasswordException("New passwords do not match OR Invalid password");
         }
+    }
 
     private String generateOtp() {
-        // Burada güvenli bir şekilde OTP oluşturulabilir (örneğin, Random sınıfı kullanılabilir)
-        // Bu örnek sadece basit bir şekilde 6 haneli bir OTP döndürüyor
         Random random = new Random();
         int otp = 100000 + random.nextInt(900000);
         return String.valueOf(otp);
@@ -289,42 +286,54 @@ public class UserServiceImpl implements UserService {
 
         // Kullanıcının resetToken'ını güncelle
         user.setResetToken(otp);
+        user.setResetTokenCreationTime(LocalDateTime.now());
         userRepository.save(user);
     }
 
     @Override
     public void resetPasswordWithOtp(UserResetPasswordRequest forgetDto) {
-        User user = userRepository.findByEmail(forgetDto.getEmail())
-                .orElseThrow(() -> new UserMailNotFoundExeption("User not found with email: " + forgetDto.getEmail()));
+        User user = userRepository.findByResetToken(forgetDto.getOtp())
+                .orElseThrow(() -> new UserMailNotFoundExeption("User not found: "));
 
-        // Kullanıcının resetToken'ını kontrol et ve süresini kontrol et
-        if (forgetDto.getOtp().equals(user.getResetToken()) && isOtpValid(user.getResetTokenCreationTime())) {
-            if (forgetDto.getNewPassword().equals(forgetDto.getConfirmNewPassword())) {
-                // Yeni parolayı şifrele ve kaydet
-                String encryptedPassword = passwordEncoder.encode(forgetDto.getNewPassword());
-                user.setPassword(encryptedPassword);
-                user.setResetToken(null);  // Parola sıfırlama işlemi tamamlandığında token'ı temizle
+        if (isOtpValid(user.getResetTokenCreationTime())) {
+            LocalDateTime currentTime = LocalDateTime.now(); // Doğru şekilde güncellendi
+            LocalDateTime expirationTime = user.getResetTokenCreationTime().plusMinutes(5); // 5 dakika süre tanımla
+
+            if (currentTime.isBefore(expirationTime)) {
+                user.setChange(true);
                 userRepository.save(user);
+            } else {
+                throw new InvalidOtpException("OTP has expired");
             }
-                throw new PasswordsNotMatchException("New password and confirm password do not match");
-
+        } else {
+            throw new InvalidOtpException("Invalid OTP");
         }
-             throw new InvalidOtpException("(New password and confirm password do not match) or Invalid or expired OTP");
-
     }
 
-
     private boolean isOtpValid(LocalDateTime creationTime) {
-        LocalDateTime currentTime = LocalDateTime.now();
-
         if (creationTime == null) {
             return false;
         }
-
-        long secondsElapsed = ChronoUnit.SECONDS.between(creationTime, currentTime);
-
-        return secondsElapsed <= 300;
+        LocalDateTime currentTime = LocalDateTime.now(); // Doğru şekilde güncellendi
+        LocalDateTime expirationTime = creationTime.plusMinutes(5); // 5 dakika süre tanımla
+        return currentTime.isBefore(expirationTime);
     }
+    @Override
+    public void confirmPassword(ConfirmPassword confirmPassword) {
+        User user = userRepository.findByChangeIsTrue().orElseThrow(() -> new InvalidOtpException("expired OTP"));
+        if (confirmPassword.getNewPassword().equals(confirmPassword.getConfirmNewPassword())) {
+            String encryptedPassword = passwordEncoder.encode(confirmPassword.getNewPassword());
+            user.setPassword(encryptedPassword);
+            user.setResetToken(null);
+            user.setChange(false);
+            userRepository.save(user);
+        } else {
+            throw new PasswordsNotMatchException("New password and confirm password do not match");
+        }
+
+    }
+
+
 }
 
 

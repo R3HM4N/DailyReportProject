@@ -1,6 +1,7 @@
 package az.projectdailyreport.projectdailyreport.service;
 
 import az.projectdailyreport.projectdailyreport.dto.*;
+import az.projectdailyreport.projectdailyreport.dto.request.ConfirmPassword;
 import az.projectdailyreport.projectdailyreport.dto.request.CreateUserRequest;
 import az.projectdailyreport.projectdailyreport.dto.request.UserResetPasswordRequest;
 import az.projectdailyreport.projectdailyreport.model.Status;
@@ -17,6 +18,7 @@ public interface UserService {
     List<UserGetAll> getAll();
     User getSignedInUser();
     String resetPassword(Long userId, UserReset userReset);
+    void confirmPassword(ConfirmPassword confirmPassword);
     void changePassword(UserChangePassword changePassword);
     void resetPasswordWithOtp(UserResetPasswordRequest forgetDto);
     void sendPasswordResetEmail(String email);
