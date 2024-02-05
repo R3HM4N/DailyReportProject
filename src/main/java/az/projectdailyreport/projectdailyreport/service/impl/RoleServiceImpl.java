@@ -18,12 +18,13 @@ public class RoleServiceImpl implements RoleService {
 
 
     @Override
-    public List<Role> getAllRoles() {
-        return roleRepository.findAll();
+    public List<Role> getAllRolesExceptOne() {
+        return roleRepository.findAllExceptOne();
     }
 
     @Override
-    public Role getRoleByName(String roleName) {
-        return roleRepository.findByRoleName(roleName);
+    public List<Role> getAllRolesExceptSuperAdminAndAdmin() {
+        return roleRepository.findAllExceptRoles(List.of("SUPER_ADMIN", "ADMIN"));
     }
+
 }

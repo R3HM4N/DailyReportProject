@@ -94,13 +94,13 @@ public class UserServiceImpl implements UserService {
             } else if (createUserRequest.getRole().getId() == 3) {
                 user.setRoleName(RoleName.HEAD);
             } else if (createUserRequest.getRole().getId() == 4) {
-                user.setRoleName(RoleName.USER);
+                user.setRoleName(RoleName.EMPLOYEE);
             }
         } else if (user1.getRoleName().equals(RoleName.ADMIN)) {
             if (createUserRequest.getRole().getId() == 3) {
                 user.setRoleName(RoleName.HEAD);
             } else if (createUserRequest.getRole().getId() == 4) {
-                user.setRoleName(RoleName.USER);
+                user.setRoleName(RoleName.EMPLOYEE);
             }
         }
 

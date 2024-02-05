@@ -5,6 +5,7 @@ import az.projectdailyreport.projectdailyreport.model.Role;
 import java.util.List;
 
 public interface RoleService {
-    List<Role> getAllRoles();
-    Role getRoleByName(String roleName);
+//    List<Role> getAllRoles();
+    List<Role> getAllRolesExceptOne();
+    List<Role> getAllRolesExceptSuperAdminAndAdmin();
 }

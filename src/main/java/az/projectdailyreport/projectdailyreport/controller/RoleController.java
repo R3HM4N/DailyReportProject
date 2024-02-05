@@ -17,18 +17,14 @@ public class RoleController {
     private final RoleService roleService;
 
 
-    @GetMapping
+    @GetMapping("/getRoleForSuperAdmin")
     public List<Role> getAllRoles() {
-        return roleService.getAllRoles();
+        return roleService.getAllRolesExceptOne();
     }
 
-    @GetMapping("/{roleName}")
-    public ResponseEntity<Role> getRoleByName(@PathVariable String roleName) {
-        Role role = roleService.getRoleByName(roleName);
-        if (role != null) {
-            return new ResponseEntity<>(role, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+
+    @GetMapping("/getRoleForAdmin")
+    public List<Role> getRolesExceptSuperAdminAndAdmin() {
+        return roleService.getAllRolesExceptSuperAdminAndAdmin();
     }
 }

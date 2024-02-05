@@ -4,7 +4,7 @@ public enum     RoleName {
     SUPER_ADMIN,
     ADMIN,
     HEAD,
-    USER
+    EMPLOYEE
 
 //public enum RoleName {
 //    ROLE_SUPERADMIN("SuperAdmin"),
