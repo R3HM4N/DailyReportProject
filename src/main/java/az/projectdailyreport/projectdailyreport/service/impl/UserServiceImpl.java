@@ -220,7 +220,7 @@ public class UserServiceImpl implements UserService {
             } else {
                 userRepository.save(existingUser);
             }
-            return "Şifre sıfırlama işlemi başarılı.";
+            return "Update is complete";
 
         } else {
             throw new EntityNotFoundException("Password change failed: " + userId);
