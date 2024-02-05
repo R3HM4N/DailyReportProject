@@ -53,7 +53,6 @@ public class DailyReportServiceImpl implements DailyReportService {
         DailyReport dailyReport = new DailyReport();
         dailyReport.setFirstName(user.getFirstName());
         dailyReport.setLastName(user.getLastName());
-//        dailyReport.setLocalDateTime(LocalDateTime.now());
         LocalDateTime utcDateTime = LocalDateTime.now(ZoneOffset.UTC);
         dailyReport.setLocalDateTime(utcDateTime);
         dailyReport.setReportText(dailyReportRequest.getReportText());

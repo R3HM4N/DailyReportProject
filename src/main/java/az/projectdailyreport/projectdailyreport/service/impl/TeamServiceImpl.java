@@ -2,7 +2,6 @@ package az.projectdailyreport.projectdailyreport.service.impl;
 
 import az.projectdailyreport.projectdailyreport.dto.RoleDTO;
 import az.projectdailyreport.projectdailyreport.dto.TeamResponse;
-import az.projectdailyreport.projectdailyreport.dto.UserDTO;
 import az.projectdailyreport.projectdailyreport.dto.team.TeamGetByIdDto;
 import az.projectdailyreport.projectdailyreport.dto.team.TeamUserDto;
 import az.projectdailyreport.projectdailyreport.exception.TeamExistsException;
@@ -15,11 +14,9 @@ import az.projectdailyreport.projectdailyreport.model.User;
 import az.projectdailyreport.projectdailyreport.repository.TeamRepository;
 import az.projectdailyreport.projectdailyreport.repository.UserRepository;
 import az.projectdailyreport.projectdailyreport.service.TeamService;
-import az.projectdailyreport.projectdailyreport.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -90,19 +87,14 @@ public class TeamServiceImpl implements TeamService {
 
         String updatedTeamName = updatedTeamDto.getTeamName();
 
-        // Check if the updated team name is not already in use by another team
         if (!existingTeam.getTeamName().equals(updatedTeamName) &&
                 teamRepository.existsByTeamName(updatedTeamName)) {
             throw new TeamExistsException("Another team with the same name already exists.");
         }
-
-        // Use ModelMapper to map fields from updatedTeamDto to existingTeam
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.map(updatedTeamDto, existingTeam);
 
-        // You can also update other fields if needed
 
-        // Update the team users
         if (userIdsToAdd != null) {
             for (Long userId : userIdsToAdd) {
                 User user = userRepository.findById(userId)
@@ -125,16 +117,13 @@ public class TeamServiceImpl implements TeamService {
                     userToRemove.setTeam(null);
                     userRepository.save(userToRemove);
                 } else {
-                    // Kullanıcı bulunamadığında hata vermek yerine işlemi sessizce geç
                     continue;
                 }
             }
         }
 
-        // Save the updated team
         existingTeam = teamRepository.save(existingTeam);
 
-        // Map the updated team to TeamResponse
         TeamResponse updatedTeamResponse = modelMapper.map(existingTeam, TeamResponse.class);
         return updatedTeamResponse;
     }
@@ -150,21 +139,5 @@ public class TeamServiceImpl implements TeamService {
             throw new TeamNotEmptyException(teamId);
         }
     }
-
-
-
-
-//    @Override
-//    @Transactional
-//    public void softDeleteTeam(Long id) {
-//        Team team = teamRepository.findById(id)
-//                .orElseThrow(() -> new TeamNotFoundException(id));
-//
-//        if (team.getStatus() == Status.DELETED) {
-//            throw new TeamAlreadyDeletedException(id);
-//        }
-//
-//        teamRepository.softDeleteTeam(id);
-//    }
 
 }

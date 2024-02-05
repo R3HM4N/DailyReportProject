@@ -52,7 +52,6 @@ public class ProjectServiceImpl implements ProjectService {
 
         Project savedProject = projectRepository.save(project);
 
-        // Convert to DTO using ModelMapper
         return modelMapper.map(savedProject, ProjectResponse.class);
     }
 
@@ -76,23 +75,7 @@ public class ProjectServiceImpl implements ProjectService {
     public List<Project> getProjectByIds(List <Long> projectId) {
         return projectRepository.findAllById(projectId);
     }
-//    @Override
-//    @Transactional
-//    public void softDeleteProject(Long id) {
-//        Project project = projectRepository.findById(id)
-//                .orElseThrow(() -> new ProjectNotFoundException(id));
-//
-//        if (Deleted.DELETED.equals(project.getStatus())) {
-//            throw new ProjectAlreadyDeletedException(id);
-//        }
-//
-//        // Yeniden soft delete denemesini kontrol et
-//        if (projectRepository.existsByIdAndStatus(id, Deleted.DELETED)) {
-//            throw new ProjectAlreadyDeletedException(id);
-//        }
-//
-//        projectRepository.softDeleteProject(id);
-//    }
+
 
 
 
@@ -114,17 +97,13 @@ public class ProjectServiceImpl implements ProjectService {
 
         String updatedProjectName = projectUpdateDto.getProjectName();
 
-        // Check if the updated project name is not already in use by another project
         if (!existingProject.getProjectName().equals(updatedProjectName) &&
                 projectRepository.existsByProjectName(updatedProjectName)) {
             throw new ProjectExistsException("Another project with the same name already exists.");
         }
 
-        // Update project fields
         existingProject.setProjectName(updatedProjectName);
-        // You can also update other fields if needed
 
-        // Add users to project
         if (userIdsToAdd != null) {
             for (Long userId : userIdsToAdd) {
                 User user = userRepository.findById(userId)
@@ -137,7 +116,6 @@ public class ProjectServiceImpl implements ProjectService {
             }
         }
 
-        // Remove users from project
         if (userIdsToRemove != null) {
             for (Long userId : userIdsToRemove) {
                 User userToRemove = null;
@@ -155,7 +133,6 @@ public class ProjectServiceImpl implements ProjectService {
             }
         }
 
-        // Save the updated project
         return projectRepository.save(existingProject);
     }
 
@@ -212,12 +189,5 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
 
-//    @Override
-//    public void hardDeleteProject(Long id) {
-//        Project project = projectRepository.findById(id)
-//                .orElseThrow(() -> new ProjectNotFoundException(id));
-//
-//
-//        projectRepository.deleteById(id);
-//    }
+
 }

@@ -2,7 +2,6 @@ package az.projectdailyreport.projectdailyreport.service.impl;
 
 import az.projectdailyreport.projectdailyreport.dto.*;
 import az.projectdailyreport.projectdailyreport.dto.project.ProjectDTO;
-import az.projectdailyreport.projectdailyreport.dto.request.AuthenticationResponse;
 import az.projectdailyreport.projectdailyreport.dto.request.ConfirmPassword;
 import az.projectdailyreport.projectdailyreport.dto.request.CreateUserRequest;
 import az.projectdailyreport.projectdailyreport.dto.request.UserResetPasswordRequest;
@@ -25,14 +24,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -157,7 +154,6 @@ public class UserServiceImpl implements UserService {
                 .map(UserMapper::toDTO)
                 .collect(Collectors.toList());
 
-        // UserDTO listesini kullanarak yeni bir Page oluşturma
         return new PageImpl<>(userDTOList, pageable, usersPage.getTotalElements());
     }
 
@@ -268,7 +264,6 @@ public class UserServiceImpl implements UserService {
         try {
             emailService.sendSimpleMessage(email, subject, message);
         } catch (MessagingException e) {
-            // E-posta gönderimi başarısız olursa isteğe bağlı olarak bir hata yönetimi yapılabilir
             throw new EmailNotSentException("Failed to send OTP via email");
         }
     }
@@ -277,14 +272,10 @@ public class UserServiceImpl implements UserService {
     public void sendPasswordResetEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserMailNotFoundExeption("User not found with email: " + email));
-
-        // Otp oluştur
         String otp = generateOtp();
 
-        // Oluşturulan otp'yi kullanıcıya e-posta ile gönder
         sendOtpByEmail(email, otp);
 
-        // Kullanıcının resetToken'ını güncelle
         user.setResetToken(otp);
         user.setResetTokenCreationTime(LocalDateTime.now());
         userRepository.save(user);

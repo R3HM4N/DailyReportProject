@@ -32,15 +32,6 @@ public class ProjectController {
         return ResponseEntity.ok(projectResponse);
     }
 
-
-
-
-//    @DeleteMapping("/soft/{id}")
-//    public ResponseEntity<String> softDeleteProject(@PathVariable Long id) {
-//        projectService.softDeleteProject(id);
-//        return ResponseEntity.ok("Project successfully SOFT Delete edildi.");
-//    }
-
     @PutMapping("/{projectId}")
     public ResponseEntity<String> updateProjectAndUsers(@PathVariable Long projectId,
                                                          @RequestBody ProjectUpdateDto projectUpdateDto,
@@ -63,13 +54,4 @@ public class ProjectController {
         return ResponseEntity.ok(filteredProjects);
     }
 
-
-    // Hard Delete
-//    @DeleteMapping("/hard/{id}")
-//    public ResponseEntity<String> hardDeleteProject(@PathVariable Long id) {
-//
-//            projectService.hardDeleteProject(id);
-//            return ResponseEntity.ok("Project successfully HARD Delete edildi.");
-//
-//    }
 }
