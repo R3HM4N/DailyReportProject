@@ -5,6 +5,7 @@ import az.projectdailyreport.projectdailyreport.validation.CrocusoftEmail;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 import java.util.List;
@@ -14,21 +15,23 @@ import java.util.List;
 public class CreateUserRequest {
 
 
-    @NotBlank(message = "Ad boş olamaz")
+    @NotBlank(message = "FirstName is required")
     private String firstName;
 
-    @NotBlank(message = "Soyad boş olamaz")
+    @NotBlank(message = "Lastname is required")
     private String lastName;
 
-    @NotBlank(message = "Şifre boş olamaz")
-    private String password;
+    @NotBlank(message = "Password is required")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,20}$",
+            message = "Invalid Password pattern. Password must contain 8 to 20 characters at least one digit, lower, upper case ."
+    )    private String password;
 
     @NotNull(message = "Rol belirtilmelidir")
     private Role role;
 
 
 //    @CrocusoftEmail
-    @Email(message = "Geçerli bir e-posta adresi değil")
+    @Email(message = "Not a valid email address")
     private String mail;
 
     @NotNull(message = "Takım belirtilmelidir")
