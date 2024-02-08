@@ -2,6 +2,8 @@ package az.projectdailyreport.projectdailyreport.service.impl;
 
 import az.projectdailyreport.projectdailyreport.dto.request.AuthenticationRequest;
 import az.projectdailyreport.projectdailyreport.dto.request.AuthenticationResponse;
+import az.projectdailyreport.projectdailyreport.exception.EmailNotSentException;
+import az.projectdailyreport.projectdailyreport.exception.UserNotFoundException;
 import az.projectdailyreport.projectdailyreport.model.User;
 import az.projectdailyreport.projectdailyreport.model.token.Token;
 import az.projectdailyreport.projectdailyreport.model.token.TokenType;
@@ -13,6 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,24 +33,33 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getMail(),
-                        request.getPassword()
-                )
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getMail(),
+                            request.getPassword()
+                    )
+            );
+        } catch (BadCredentialsException ex) {
+            // Eğer kimlik doğrulaması başarısız olursa, hata fırlat
+            throw new EmailNotSentException("Hatalı kullanıcı adı veya şifre");
+        }
+
         var user = repository.findByEmail(request.getMail())
-                .orElseThrow();
+                .orElseThrow(() -> new EmailNotSentException("Kullanıcı bulunamadı"));
+
         var jwtToken = jwtService.createToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);
+
         return AuthenticationResponse.builder()
                 .id(user.getId())
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
                 .build();
     }
+
 
     public void saveUserToken(User user, String jwtToken) {
         var token = Token.builder()
