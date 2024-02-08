@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class AuthenticationRequest {
 
     @NotBlank(message = "Username is required")
-//    @CrocusoftEmail
+    @CrocusoftEmail
     @Email(message = "Geçerli bir e-posta adresi değil")
     private String mail;
     @NotBlank(message = "Password is required")
