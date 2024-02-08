@@ -1,6 +1,5 @@
 package az.projectdailyreport.projectdailyreport.dto.project;
 
-import az.projectdailyreport.projectdailyreport.dto.ProjectUserDto;
 import az.projectdailyreport.projectdailyreport.model.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +15,7 @@ import java.util.List;
 public class ProjectFilterDto {
 
     private Long id;
+
     private Status status;
     private String projectName;
     private List<ProjectUserDto> users; // Assuming you have a UserDTO class

@@ -8,6 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -20,20 +21,19 @@ public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
+    private final CorsConfig corsConfig;
+
 
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity
+                .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("api/v1/auth/**").permitAll()
 
                                 .requestMatchers(permitSwagger).permitAll()
-//                                .requestMatchers("/users/**").permitAll()
-//                                .requestMatchers("/api/teams/**").permitAll()
-//                                .requestMatchers("/api/project/**").permitAll()
-//                                .requestMatchers("/api/report/**").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/users/forget-password-otp").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/users/forget-password-email").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/users/confirm-password").permitAll()
@@ -58,10 +58,10 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.POST,"/api/report/**").hasAnyAuthority("EMPLOYEE")
                                 .requestMatchers(HttpMethod.PUT,"/api/report/**").hasAnyAuthority("EMPLOYEE")
                                 .anyRequest().authenticated());
-        http.authenticationProvider(authenticationProvider);
-        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        httpSecurity.authenticationProvider(authenticationProvider);
+        httpSecurity.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
+        return httpSecurity.build();
     }
 
 //

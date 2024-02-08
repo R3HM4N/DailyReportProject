@@ -1,4 +1,4 @@
-package az.projectdailyreport.projectdailyreport.dto;
+package az.projectdailyreport.projectdailyreport.dto.project;
 
 import az.projectdailyreport.projectdailyreport.dto.team.TeamDTO;
 import az.projectdailyreport.projectdailyreport.model.Status;

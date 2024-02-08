@@ -1,6 +1,5 @@
 package az.projectdailyreport.projectdailyreport.service.impl;
 
-import az.projectdailyreport.projectdailyreport.dto.ProjectUserDto;
 import az.projectdailyreport.projectdailyreport.dto.project.*;
 import az.projectdailyreport.projectdailyreport.dto.request.ProjectRequest;
 import az.projectdailyreport.projectdailyreport.dto.team.TeamDTO;
