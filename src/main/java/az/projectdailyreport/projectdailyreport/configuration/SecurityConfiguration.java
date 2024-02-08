@@ -50,10 +50,13 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.POST,"/api/project/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
                                 .requestMatchers(HttpMethod.DELETE,"/api/project/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
                                 .requestMatchers(HttpMethod.PUT,"/api/project/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
-                                .requestMatchers(HttpMethod.GET,"/api/report/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD","USER")
-                                .requestMatchers(HttpMethod.GET,"/api/report/user").hasAuthority("USER")
-                                .requestMatchers(HttpMethod.POST,"/api/report/**").hasAnyAuthority("USER")
-                                .requestMatchers(HttpMethod.PUT,"/api/report/**").hasAnyAuthority("USER")
+                                .requestMatchers(HttpMethod.GET,"/api/report/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD","EMPLOYEE")
+                                .requestMatchers(HttpMethod.POST,"/api/report/{reportId}/").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD","EMPLOYEE")
+                                .requestMatchers(HttpMethod.GET,"/api/report/user/reports").hasAuthority("EMPLOYEE")
+                                .requestMatchers(HttpMethod.GET,"/api/report/admin/filtir").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD")
+                                .requestMatchers(HttpMethod.GET,"/api/report/export-excel").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD")
+                                .requestMatchers(HttpMethod.POST,"/api/report/**").hasAnyAuthority("EMPLOYEE")
+                                .requestMatchers(HttpMethod.PUT,"/api/report/**").hasAnyAuthority("EMPLOYEE")
                                 .anyRequest().authenticated());
         http.authenticationProvider(authenticationProvider);
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

@@ -24,14 +24,9 @@ public interface DailyReportRepository  extends JpaRepository<DailyReport,Long> 
 
     @Query("SELECT dr FROM DailyReport dr " +
             "WHERE (:userIds IS NULL OR (:userIds IS NOT NULL AND dr.user.id IN (:userIds))) " +
-            "" +
-            "" +
-            "" +
             "AND (((:startDate IS NULL OR DATE(dr.localDateTime) >= :startDate)" +
             " AND (:endDate IS NULL OR DATE(dr.localDateTime) <= :startDate))" +
             "   OR DATE(dr.localDateTime) BETWEEN :startDate AND :endDate ) " +
-
-
             "AND (:projectIds IS NULL OR (:projectIds IS NOT NULL AND dr.project.id IN (:projectIds)))")
     Page<DailyReport> findByUserIdInAndLocalDateTimeBetweenAndProjectIdIn(
             @Param("userIds") List<Long> userIds,

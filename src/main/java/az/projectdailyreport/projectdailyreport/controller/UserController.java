@@ -34,7 +34,7 @@ public class UserController {
     }
 
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<User> createUser(@RequestBody CreateUserRequest createUserRequest) {
         User createdUser = userService.createUser(createUserRequest);
         return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
@@ -96,7 +96,7 @@ public class UserController {
         return userService.resetPassword(userId, userReset);
     }
 
-    @PostMapping("/change-password")
+    @PutMapping("/change-password")
     public ResponseEntity<String> changePassword(@RequestBody UserChangePassword changePassword) {
 
             userService.changePassword(changePassword);
@@ -117,7 +117,7 @@ public class UserController {
         userService.resetPasswordWithOtp(resetPasswordRequest );
         return new ResponseEntity<>("Otp code correct", HttpStatus.OK);
     }
-    @PostMapping("/confirm-password")
+    @PutMapping("/confirm-password")
     public void confirmPassword(@RequestBody ConfirmPassword confirmPassword) {
         userService.confirmPassword(confirmPassword);
     }

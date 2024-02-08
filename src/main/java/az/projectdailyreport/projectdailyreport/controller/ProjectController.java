@@ -22,7 +22,7 @@ public class ProjectController {
 
     private final ProjectService projectService;
 
-    @GetMapping("/get")
+    @GetMapping()
     public List<ProjectGetDto> getAllProjects() {
         return projectService.getAllProject();
     }

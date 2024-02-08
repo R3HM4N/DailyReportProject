@@ -26,7 +26,7 @@ public class TeamController {
 
 
 
-    @GetMapping("/get")
+    @GetMapping
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     public List<Team> getAllTeams() {
         return teamService.getAllTeams();
@@ -55,7 +55,7 @@ public class TeamController {
     }
 
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<Team> createTeam(@RequestBody TeamResponse teamDto) {
         Team createdTeam = teamService.createTeam(teamDto);
         return new ResponseEntity<>(createdTeam, HttpStatus.CREATED);

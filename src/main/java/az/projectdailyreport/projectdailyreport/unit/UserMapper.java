@@ -75,27 +75,25 @@ public class UserMapper {
         return modelMapper.map(project, ProjectDTO.class);
     }
 
-    @Bean
-    public ModelMapper modelMapper() {
-        ModelMapper modelMapper = new ModelMapper();
-
-        // Projelerin ve kullanıcıların karşılıklı olarak haritalanması için konfigürasyon
-        modelMapper.addMappings(new PropertyMap<Project, ProjectDTO>() {
-            @Override
-            protected void configure() {
-                // Projeden kullanıcıları hariç tutmamıza gerek yok, bu yüzden herhangi bir konfigürasyon eklememize gerek yok
-            }
-        });
-
-        modelMapper.addMappings(new PropertyMap<User, UserGetDTO>() {
-            @Override
-            protected void configure() {
-                // Kullanıcıdan projeleri hariç tutmamıza gerek yok, bu yüzden herhangi bir konfigürasyon eklememize gerek yok
-            }
-        });
-
-        return modelMapper;
-    }
+//    @Bean
+//    public ModelMapper modelMapper() {
+//        ModelMapper modelMapper = new ModelMapper();
+//
+//        modelMapper.addMappings(new PropertyMap<Project, ProjectDTO>() {
+//            @Override
+//            protected void configure() {
+//            }
+//        });
+//
+//        modelMapper.addMappings(new PropertyMap<User, UserGetDTO>() {
+//            @Override
+//            protected void configure() {
+//                // Kullanıcıdan projeleri hariç tutmamıza gerek yok, bu yüzden herhangi bir konfigürasyon eklememize gerek yok
+//            }
+//        });
+//
+//        return modelMapper;
+//    }
     public UserGetDTO toBy1DTO(User user) {
         UserGetDTO userGetDTO = modelMapper.map(user, UserGetDTO.class);
 

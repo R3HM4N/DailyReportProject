@@ -74,22 +74,22 @@ public class DailyReportController {
             return new ResponseEntity<>(updatedReportDTO, HttpStatus.OK);
 
     }
-    @GetMapping("/user")
-    public ResponseEntity<List<DailyReportUser>> getAllDailyReportsForUser() {
-
-        User signedInUser = userService.getSignedInUser();
-        Optional<User> userOptional = userRepository.findById(signedInUser.getId());
-
-
-        List<DailyReportUser> dailyReportsForUser = dailyReportService.getAllDailyReportsForUser(userOptional.get().getId());
-        return ResponseEntity.ok(dailyReportsForUser);
-    }
-
-    @GetMapping("/admin")
-    public ResponseEntity<List<DailyReportAdmin>> getAllDailyReportsForAdmin() {
-        List<DailyReportAdmin> dailyReportsForAdmin = dailyReportService.getAllDailyReportsForAdmin();
-        return ResponseEntity.ok(dailyReportsForAdmin);
-    }
+//    @GetMapping("/user")
+//    public ResponseEntity<List<DailyReportUser>> getAllDailyReportsForUser() {
+//
+//        User signedInUser = userService.getSignedInUser();
+//        Optional<User> userOptional = userRepository.findById(signedInUser.getId());
+//
+//
+//        List<DailyReportUser> dailyReportsForUser = dailyReportService.getAllDailyReportsForUser(userOptional.get().getId());
+//        return ResponseEntity.ok(dailyReportsForUser);
+//    }
+//
+//    @GetMapping("/admin")
+//    public ResponseEntity<List<DailyReportAdmin>> getAllDailyReportsForAdmin() {
+//        List<DailyReportAdmin> dailyReportsForAdmin = dailyReportService.getAllDailyReportsForAdmin();
+//        return ResponseEntity.ok(dailyReportsForAdmin);
+//    }
 
     @GetMapping("/user/reports")
     public ResponseEntity<List<DailyReportUser>> getUserReportsBetweenDates(
