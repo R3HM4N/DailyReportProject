@@ -36,13 +36,13 @@ public class AuthenticationService {
         var userOptional = repository.findByEmail(request.getMail());
 
         if (userOptional.isEmpty()) {
-            throw new EmailNotSentException("Kullanıcı bulunamadı");
+            throw new EmailNotSentException("User not found");
         }
 
         var user = userOptional.get();
 
         if (!passwordMatches(user, request.getPassword())) {
-            throw new EmailNotSentException("Sifre yanlisdir");
+            throw new EmailNotSentException("password is incorrect");
         }
 
         var jwtToken = jwtService.createToken(user);
