@@ -1,4 +1,5 @@
 package az.projectdailyreport.projectdailyreport.model;
+import az.projectdailyreport.projectdailyreport.validation.CrocusoftEmail;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -33,14 +34,17 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @Builder.Default
     private boolean deleted = false;
 
+    @Builder.Default
     @Column(name = "is_change", nullable = false)
     private boolean change = false;
 
-//    @CrocusoftEmail
+    @CrocusoftEmail
+    @Builder.Default
     @Email(message = "Geçerli bir e-posta adresi değil")
-    private String mail;
+    private String mail = null;
 
     @Enumerated(EnumType.STRING)
     private RoleName roleName;

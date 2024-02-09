@@ -27,7 +27,6 @@ public class TeamController {
 
 
     @GetMapping
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public List<Team> getAllTeams() {
         return teamService.getAllTeams();
     }
