@@ -33,20 +33,17 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getMail(),
-                            request.getPassword()
-                    )
-            );
-        } catch (BadCredentialsException ex) {
-            // Eğer kimlik doğrulaması başarısız olursa, hata fırlat
-            throw new EmailNotSentException("Hatalı kullanıcı adı veya şifre");
+        var userOptional = repository.findByEmail(request.getMail());
+
+        if (userOptional.isEmpty()) {
+            throw new EmailNotSentException("Kullanıcı bulunamadı");
         }
 
-        var user = repository.findByEmail(request.getMail())
-                .orElseThrow(() -> new EmailNotSentException("Kullanıcı bulunamadı"));
+        var user = userOptional.get();
+
+        if (!passwordMatches(user, request.getPassword())) {
+            throw new EmailNotSentException("Sifre yanlisdir");
+        }
 
         var jwtToken = jwtService.createToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
@@ -58,6 +55,10 @@ public class AuthenticationService {
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    private boolean passwordMatches(User user, String password) {
+        return passwordEncoder.matches(password, user.getPassword());
     }
 
 
