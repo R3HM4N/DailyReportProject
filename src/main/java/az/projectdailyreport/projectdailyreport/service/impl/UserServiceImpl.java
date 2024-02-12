@@ -6,10 +6,7 @@ import az.projectdailyreport.projectdailyreport.dto.request.ConfirmPassword;
 import az.projectdailyreport.projectdailyreport.dto.request.CreateUserRequest;
 import az.projectdailyreport.projectdailyreport.dto.request.UserResetPasswordRequest;
 import az.projectdailyreport.projectdailyreport.exception.*;
-import az.projectdailyreport.projectdailyreport.model.RoleName;
-import az.projectdailyreport.projectdailyreport.model.Team;
-import az.projectdailyreport.projectdailyreport.model.User;
-import az.projectdailyreport.projectdailyreport.model.Status;
+import az.projectdailyreport.projectdailyreport.model.*;
 import az.projectdailyreport.projectdailyreport.repository.TeamRepository;
 import az.projectdailyreport.projectdailyreport.repository.UserRepository;
 import az.projectdailyreport.projectdailyreport.service.UserService;
@@ -45,6 +42,7 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationService authenticationService;
     private final EmailService emailService;
     private final TeamRepository teamRepository;
+    private final RoleServiceImpl roleService;
 
     @Override
     public List<UserGetAll> getAll() {
@@ -190,17 +188,28 @@ public class UserServiceImpl implements UserService {
 
         if (userOptional.isPresent()) {
             User existingUser = userOptional.get();
-            modelMapper.map(updatedUserDTO, existingUser);
-            existingUser.getTeam().setId(updatedUserDTO.getTeam().getId());
-            existingUser.getTeam().setTeamName(updatedUserDTO.getTeam().getTeamName());
 
-            userRepository.save(existingUser);
+            User updatedUser = User.builder()
+                    .id(existingUser.getId())
+                    .firstName(updatedUserDTO.getFirstName())
+                    .lastName(updatedUserDTO.getLastName())
+                    .mail(updatedUserDTO.getEmail())
+                    .build();
+                Optional<Team> team = teamRepository.findById(updatedUserDTO.getTeamId());
+                team.ifPresent(existingUser::setTeam);
+                Optional<Role> role = roleService.findRoleById(updatedUserDTO.getRoleId());
+                role.ifPresent(existingUser::setRole);
+
+
+            userRepository.save(updatedUser);
 
             return UserMapper.toDTO(existingUser);
         } else {
             throw new EntityNotFoundException("User not found with id: " + userId);
         }
     }
+
+
 
     @Override
     public String resetPassword(Long userId, UserReset userReset) {

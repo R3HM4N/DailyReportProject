@@ -32,7 +32,6 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("api/v1/auth/**").permitAll()
-
                                 .requestMatchers(permitSwagger).permitAll()
                                 .requestMatchers(HttpMethod.POST,"/users/forget-password-otp").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/users/forget-password-email").permitAll()
@@ -41,7 +40,6 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.POST,"/users/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
                                 .requestMatchers(HttpMethod.DELETE,"/users/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
                                 .requestMatchers(HttpMethod.PUT,"/users/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
-
                                 .requestMatchers(HttpMethod.GET,"/api/teams/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD")
                                 .requestMatchers(HttpMethod.POST,"/api/teams/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
                                 .requestMatchers(HttpMethod.DELETE,"/api/teams/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
@@ -64,7 +62,6 @@ public class SecurityConfiguration {
         return httpSecurity.build();
     }
 
-//
     public static String[] permitSwagger = {
             "/v2/api-docs",
             "/v3/api-docs",

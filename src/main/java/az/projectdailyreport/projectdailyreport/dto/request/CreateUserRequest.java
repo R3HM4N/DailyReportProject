@@ -30,11 +30,9 @@ public class CreateUserRequest {
     private Role role;
 
 
-//    @CrocusoftEmail
-    @Email(message = "Not a valid email address")
+    @CrocusoftEmail
     private String mail;
 
-    @NotNull(message = "Takım belirtilmelidir")
     private Long teamId;
 
 

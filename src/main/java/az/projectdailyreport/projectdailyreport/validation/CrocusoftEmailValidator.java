@@ -11,7 +11,6 @@ public class CrocusoftEmailValidator implements ConstraintValidator<CrocusoftEma
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        // E-posta adresi içinde "crocusoft@" ifadesinin kontrolü
         if (value != null && value.contains("@crocusoft")) {
             return true;
         } else {
