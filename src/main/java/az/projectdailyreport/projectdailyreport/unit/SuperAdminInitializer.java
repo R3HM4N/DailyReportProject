@@ -1,6 +1,7 @@
 package az.projectdailyreport.projectdailyreport.unit;
 
 import az.projectdailyreport.projectdailyreport.model.RoleName;
+import az.projectdailyreport.projectdailyreport.model.Status;
 import az.projectdailyreport.projectdailyreport.model.User;
 import az.projectdailyreport.projectdailyreport.repository.RoleRepository;
 import az.projectdailyreport.projectdailyreport.repository.UserRepository;
@@ -32,7 +33,10 @@ public class SuperAdminInitializer implements CommandLineRunner {
         if (!userRepository.existsByRole(roleRepository.findById(1L).get())) {
             User superAdmin =User.builder()
                     .mail("superadmin@crocusoft.com")
+                    .firstName("Rehman")
+                    .lastName("SuperAdmin")
                     .password(passwordEncoder.encode("superadminpassword"))
+                    .status(Status.ACTIVE)
                     .role(roleRepository.findById(1L).get())
                     .roleName(RoleName.SUPER_ADMIN)
                     .build();

@@ -29,7 +29,8 @@ public interface UserService {
 
 
     void changeUserStatus(Long userId, Status newStatus);
-    Page<UserDTO> getUsersByFilters(String firstName, String lastName, Status status, List<Long> teamId, List<Long> projectIds, Pageable pageable);    UserGetDTO getUserById(Long userId);
+    Page<UserDTO> getUsersByFilters(String firstName, String lastName, Status status, List<Long> teamId, List<Long> projectIds, Pageable pageable);
+    UserGetDTO getUserById(Long userId);
 
 
 }

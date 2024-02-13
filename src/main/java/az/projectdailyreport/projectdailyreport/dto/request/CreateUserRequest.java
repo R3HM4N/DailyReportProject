@@ -35,19 +35,6 @@ public class CreateUserRequest {
 
     private Long teamId;
 
-
-
-
-//    public CreateUserRequest(String userName, String firstName, String lastName, String password, Role role,     String mail, Team team, Set<Project> projects) {
-//        this.userName = userName;
-//        this.firstName = firstName;
-//        this.lastName = lastName;
-//        this.password = password;
-//        this.role = role;
-//        this.mail = mail;
-//        this.projects = projects;
-//    }
-    // Getter ve setter metotları
 }
 
 
