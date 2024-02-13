@@ -1,5 +1,6 @@
 package az.projectdailyreport.projectdailyreport.unit;
 
+import az.projectdailyreport.projectdailyreport.model.Role;
 import az.projectdailyreport.projectdailyreport.model.RoleName;
 import az.projectdailyreport.projectdailyreport.model.Status;
 import az.projectdailyreport.projectdailyreport.model.User;
@@ -29,7 +30,30 @@ public class SuperAdminInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Super_ADMIN kullanıcısı daha önce eklenmediyse ekle
+        for (RoleName roleName : RoleName.values()) {
+            if (!roleRepository.existsByRoleName(roleName)) {
+                Role role = new Role();
+                role.setRoleName(roleName);
+                roleRepository.save(role);
+            }
+        }
+        if (!userRepository.existsByRole(roleRepository.findById(3L).get())){
+            User head = User.builder()
+                    .firstName("boyuk")
+                    .lastName("boyuk")
+                    .mail("head@crocusoft.com")
+                    .password(passwordEncoder.encode("BoyukHead"))
+                    .status(Status.ACTIVE)
+                    .role(roleRepository.findById(3L).get())
+                    .roleName(RoleName.HEAD)
+            .build();
+            userRepository.save(head);
+            System.out.println("Head created");
+
+        }
+        else {
+            System.out.println("Head already created");
+        }
         if (!userRepository.existsByRole(roleRepository.findById(1L).get())) {
             User superAdmin =User.builder()
                     .mail("superadmin@crocusoft.com")
@@ -42,9 +66,9 @@ public class SuperAdminInitializer implements CommandLineRunner {
                     .build();
 
             userRepository.save(superAdmin);
-            System.out.println("Super_ADMIN kullanıcısı başarıyla oluşturuldu.");
+            System.out.println("Super_ADMIN created.");
         } else {
-            System.out.println("Super_ADMIN kullanıcısı zaten var.");
+            System.out.println("Super_ADMIN already created.");
         }
     }
 }
