@@ -53,5 +53,10 @@ public class ProjectController {
         }
         return ResponseEntity.ok(filteredProjects);
     }
+    @GetMapping("/{projectId}")
+    public ResponseEntity<ProjectFilterDto> getProjectById(@PathVariable Long projectId) {
+        ProjectFilterDto project = projectService.getById(projectId);
+            return ResponseEntity.ok(project);
+    }
 
 }

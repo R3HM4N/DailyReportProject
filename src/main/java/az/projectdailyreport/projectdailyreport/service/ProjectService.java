@@ -17,6 +17,7 @@ public interface ProjectService {
     List<ProjectGetDto> getAllProject();
     ProjectDTO convertToDto(Project project);
     Project getProjectById(Long projectId);
+    ProjectFilterDto getById(Long projectId);
     List<Project> getProjectByIds(List <Long> projectId);
 
 //    void softDeleteProject(Long id);

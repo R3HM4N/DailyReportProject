@@ -83,6 +83,15 @@ public class ProjectServiceImpl implements ProjectService {
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
     }
 
+    @Override
+    public ProjectFilterDto getById(Long projectId) {
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
+
+        return mapToProjectFilterDto(project);
+    }
+
 
     public ProjectDTO convertToDto(Project project) {
         ModelMapper modelMapper = new ModelMapper();
