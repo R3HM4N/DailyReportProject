@@ -13,6 +13,5 @@ import java.util.List;
 @AllArgsConstructor
 public class TeamResponse {
     private String teamName;
-    private List<Long> userIds;
 
 }
