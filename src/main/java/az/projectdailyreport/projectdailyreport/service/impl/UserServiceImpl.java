@@ -12,6 +12,7 @@ import az.projectdailyreport.projectdailyreport.repository.UserRepository;
 import az.projectdailyreport.projectdailyreport.service.UserService;
 import az.projectdailyreport.projectdailyreport.unit.EmailService;
 import az.projectdailyreport.projectdailyreport.unit.UserMapper;
+import ch.qos.logback.core.joran.conditional.IfAction;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -146,13 +147,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserDTO> getUsersByFilters(String firstName, String lastName, Status status, List<Long> teamId, List<Long> projectIds, Pageable pageable) {        // UserRepository'den sayfalama ile kullanıcıları alma
+
+        User signeduser = getSignedInUser();
+        if (signeduser.getRoleName().equals(RoleName.SUPER_ADMIN) || signeduser.getRoleName().equals(RoleName.HEAD)){
         Page<User> usersPage = userRepository.findByFilters(firstName, lastName, status, teamId, projectIds, pageable);
         List<UserDTO> userDTOList = usersPage.getContent()
                 .stream()
                 .map(UserMapper::toDTO)
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(userDTOList, pageable, usersPage.getTotalElements());
+        return new PageImpl<>(userDTOList, pageable, usersPage.getTotalElements());}
+        
+            Page<User> userPage1 =userRepository.findByFiltersForAdmin(firstName, lastName, status, teamId, projectIds,signeduser.getId(), pageable);
+            List<UserDTO> userDTOList = userPage1.getContent()
+                    .stream()
+                    .map(UserMapper::toDTO)
+            .toList();
+        return new PageImpl<>(userDTOList,pageable,userPage1.getTotalElements());
+
     }
 
     @Override

@@ -46,13 +46,23 @@ public interface UserRepository extends JpaRepository<User, Long> {
     //            Pageable pageable
     //    );
     @Query("SELECT u FROM User u " +
-            "WHERE u.deleted = false " + // Exclude deleted users
+            "WHERE u.deleted = false " +
             "AND (:firstName IS NULL OR u.firstName LIKE %:firstName%) " +
             "AND (:lastName IS NULL OR u.lastName LIKE %:lastName%) " +
             "AND (:status IS NULL OR u.status = :status) " +
             "AND (:teamIds IS NULL OR u.team.id IN :teamIds) " +
             "AND (:projectIds IS NULL OR EXISTS (SELECT p FROM u.projects p WHERE p.id IN :projectIds))")
     Page<User> findByFilters(String firstName, String lastName, Status status, List<Long> teamIds, List<Long> projectIds, Pageable pageable);
+
+    @Query("SELECT u FROM User u " +
+            "WHERE u.deleted = false " +
+            "AND (:firstName IS NULL OR u.firstName LIKE %:firstName%) " +
+            "AND (:lastName IS NULL OR u.lastName LIKE %:lastName%) " +
+            "AND (:status IS NULL OR u.status = :status) " +
+            "AND (:teamIds IS NULL OR u.team.id IN :teamIds) " +
+            "AND (:projectIds IS NULL OR EXISTS (SELECT p FROM u.projects p WHERE p.id IN :projectIds)) " +
+            "AND (u.roleName = 'Employee' OR (u.roleName = 'Admin' AND u.id = :userId))")
+    Page<User> findByFiltersForAdmin(String firstName, String lastName, Status status, List<Long> teamIds, List<Long> projectIds, @Param("userId") Long userId, Pageable pageable);
 
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.projects WHERE u.id = :userId")
     Optional<User> findByIdWithProjects(@Param("userId") Long userId);
