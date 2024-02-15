@@ -121,6 +121,12 @@ public class UserController {
     public void confirmPassword(@RequestBody ConfirmPassword confirmPassword) {
         userService.confirmPassword(confirmPassword);
     }
+    @GetMapping("/profile")
+    public ResponseEntity<UserGetDTO> getLoginUserById() {
+        User user =userService.getSignedInUser();
+        UserGetDTO userDTO = userService.getUserById(user.getId());
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);}
+
 
 
 
