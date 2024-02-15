@@ -3,6 +3,7 @@ package az.projectdailyreport.projectdailyreport.service.impl;
 import az.projectdailyreport.projectdailyreport.dto.request.AuthenticationRequest;
 import az.projectdailyreport.projectdailyreport.dto.request.AuthenticationResponse;
 import az.projectdailyreport.projectdailyreport.exception.EmailNotSentException;
+import az.projectdailyreport.projectdailyreport.exception.MailAlreadyExistsException;
 import az.projectdailyreport.projectdailyreport.exception.UserNotFoundException;
 import az.projectdailyreport.projectdailyreport.model.User;
 import az.projectdailyreport.projectdailyreport.model.token.Token;
@@ -57,6 +58,7 @@ public class AuthenticationService {
                 .build();
     }
 
+
     private boolean passwordMatches(User user, String password) {
         return passwordEncoder.matches(password, user.getPassword());
     }
@@ -84,14 +86,11 @@ public class AuthenticationService {
         tokenRepository.saveAll(validUserTokens);
     }
 
-    public void refreshToken(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) throws IOException {
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         final String refreshToken;
         final String mail;
-        if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return;
         }
         refreshToken = authHeader.substring(7);
@@ -104,6 +103,7 @@ public class AuthenticationService {
                 revokeAllUserTokens(user);
                 saveUserToken(user, accessToken);
                 var authResponse = AuthenticationResponse.builder()
+                        .id(user.getId())
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)
                         .build();
@@ -112,4 +112,21 @@ public class AuthenticationService {
         }
     }
 
+    public String generateAccessToken(String refreshToken) {
+        String mail = jwtService.extractUsername(refreshToken);
+        if (mail != null) {
+            var user = repository.findByEmail(mail)
+                    .orElseThrow(() -> new MailAlreadyExistsException("User not found"));
+            if (jwtService.isTokenValid(refreshToken, user)) {
+                var accessToken = jwtService.createToken(user);
+                revokeAllUserTokens(user);
+                saveUserToken(user, accessToken);
+                return accessToken;
+            }
+        }
+        return null;
+    }
 }
+
+
+

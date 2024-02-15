@@ -32,10 +32,12 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("api/v1/auth/**").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/api/v1/auth/refresh-token/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD","EMPLOYEE")
                                 .requestMatchers(permitSwagger).permitAll()
                                 .requestMatchers(HttpMethod.POST,"/users/forget-password-otp").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/users/forget-password-email").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/users/confirm-password").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/users/profile").permitAll()
                                 .requestMatchers(HttpMethod.GET,"/users/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD")
                                 .requestMatchers(HttpMethod.POST,"/users/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
                                 .requestMatchers(HttpMethod.DELETE,"/users/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
