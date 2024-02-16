@@ -81,52 +81,35 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @Transactional
-    public TeamResponse updateTeamAndUsers(Long teamId, TeamResponse updatedTeamDto, List<Long> userIdsToAdd, List<Long> userIdsToRemove) {
+    public TeamResponse updateTeamAndUsers(Long teamId, TeamResponse newTeamName, List<Long> newUserIds) {
         Team existingTeam = teamRepository.findById(teamId)
                 .orElseThrow(() -> new TeamNotFoundException(teamId));
 
-        String updatedTeamName = updatedTeamDto.getTeamName();
+        // Takım adını güncelle
+        existingTeam.setTeamName(newTeamName.getTeamName());
 
-        if (!existingTeam.getTeamName().equals(updatedTeamName) &&
-                teamRepository.existsByTeamName(updatedTeamName)) {
-            throw new TeamExistsException("Another team with the same name already exists.");
+        // Eski kullanıcıları kaldır
+        for (User user : existingTeam.getUsers()) {
+            user.setTeam(null);
         }
-        ModelMapper modelMapper = new ModelMapper();
-        modelMapper.map(updatedTeamDto, existingTeam);
+        existingTeam.getUsers().clear();
 
-
-        if (userIdsToAdd != null) {
-            for (Long userId : userIdsToAdd) {
-                User user = userRepository.findById(userId)
-                        .orElseThrow(() -> new UserNotFoundException(userId));
-
-                user.setTeam(existingTeam);
-                existingTeam.getUsers().add(user);
-            }
-        }
-
-        if (userIdsToRemove != null) {
-            for (Long userId : userIdsToRemove) {
-                Optional<User> userOptional = existingTeam.getUsers().stream()
-                        .filter(u -> u.getId().equals(userId))
-                        .findFirst();
-
-                if (userOptional.isPresent()) {
-                    User userToRemove = userOptional.get();
-                    existingTeam.getUsers().remove(userToRemove);
-                    userToRemove.setTeam(null);
-                    userRepository.save(userToRemove);
-                } else {
-                    continue;
-                }
-            }
+        for (Long userId : newUserIds) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new UserNotFoundException(userId));
+            user.setTeam(existingTeam);
+            existingTeam.getUsers().add(user);
         }
 
         existingTeam = teamRepository.save(existingTeam);
 
-        TeamResponse updatedTeamResponse = modelMapper.map(existingTeam, TeamResponse.class);
+        TeamResponse updatedTeamResponse = new TeamResponse();
+        updatedTeamResponse.setTeamName(existingTeam.getTeamName());
+        // Diğer özellikleri buraya ekleyin
+
         return updatedTeamResponse;
     }
+
     @Override
     @Transactional
     public void deleteTeam(Long teamId) {

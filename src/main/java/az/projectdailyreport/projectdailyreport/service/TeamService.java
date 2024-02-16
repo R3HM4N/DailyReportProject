@@ -13,7 +13,7 @@ public interface TeamService {
     List<Team> getAllTeams();
     void deleteTeam(Long teamId);
     //    TeamGetByIdDto getTeamById(Long teamId);
-    TeamResponse updateTeamAndUsers(Long teamId, TeamResponse updatedTeamDto, List<Long> userIdsToAdd, List<Long> userIdsToRemove);
+    TeamResponse updateTeamAndUsers(Long teamId, TeamResponse newTeamName, List<Long> newUserIds);
     TeamGetByIdDto getById(Long id);
     Team createTeam(TeamResponse teamDto);
 //    void deleteTeam(Long id);

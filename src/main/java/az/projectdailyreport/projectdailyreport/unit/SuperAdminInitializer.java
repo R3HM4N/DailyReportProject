@@ -48,7 +48,7 @@ public class SuperAdminInitializer implements CommandLineRunner {
                     .roleName(RoleName.HEAD)
             .build();
             userRepository.save(head);
-            System.out.println("Head created");
+            System.out.println("Head created ");
 
         }
         else {

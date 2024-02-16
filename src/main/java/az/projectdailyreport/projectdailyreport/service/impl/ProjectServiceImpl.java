@@ -99,51 +99,29 @@ public class ProjectServiceImpl implements ProjectService {
     }
     @Override
     @Transactional
-    public Project updateProjectAndUsers(Long projectId, ProjectUpdateDto projectUpdateDto, List<Long> userIdsToAdd, List<Long> userIdsToRemove) {
+    public Project updateProjectAndUsers(Long projectId, ProjectUpdateDto newProjectName, List<Long> newUserIds) {
         Project existingProject = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
-        String updatedProjectName = projectUpdateDto.getProjectName();
+        // Proje adını güncelle
+        existingProject.setProjectName(newProjectName.getProjectName());
 
-        if (!existingProject.getProjectName().equals(updatedProjectName) &&
-                projectRepository.existsByProjectName(updatedProjectName)) {
-            throw new ProjectExistsException("Another project with the same name already exists.");
+        // Eski kullanıcıları kaldır
+        for (User user : existingProject.getUsers()) {
+            user.getProjects().remove(existingProject);
         }
+        existingProject.getUsers().clear();
 
-        existingProject.setProjectName(updatedProjectName);
-
-        if (userIdsToAdd != null) {
-            for (Long userId : userIdsToAdd) {
-                User user = userRepository.findById(userId)
-                        .orElseThrow(() -> new UserNotFoundException(userId));
-
-                if (!existingProject.getUsers().contains(user) && !user.getProjects().contains(existingProject)) {
-                    existingProject.getUsers().add(user);
-                    user.getProjects().add(existingProject);
-                }
-            }
-        }
-
-        if (userIdsToRemove != null) {
-            for (Long userId : userIdsToRemove) {
-                User userToRemove = null;
-                for (User user : existingProject.getUsers()) {
-                    if (user.getId().equals(userId)) {
-                        userToRemove = user;
-                        break;
-                    }
-                }
-
-                if (userToRemove != null) {
-                    existingProject.getUsers().remove(userToRemove);
-                    userToRemove.getProjects().remove(existingProject);
-                }
-            }
+        // Yeni kullanıcıları ekle
+        for (Long userId : newUserIds) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new UserNotFoundException(userId));
+            existingProject.getUsers().add(user);
+            user.getProjects().add(existingProject);
         }
 
         return projectRepository.save(existingProject);
     }
-
 
     @Override
     public Page<ProjectFilterDto> searchProjectsByName(String projectName, Pageable pageable) {

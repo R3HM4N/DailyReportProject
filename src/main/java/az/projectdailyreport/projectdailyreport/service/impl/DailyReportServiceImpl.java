@@ -44,7 +44,7 @@ public class DailyReportServiceImpl implements DailyReportService {
 
     @Override
     public DailyReportDTO createDailyReport(DailyReportRequest dailyReportRequest, User user) {
-        Project project = projectService.getProjectById(dailyReportRequest.getProjectId());
+        Project project = projectService.getProjectById (dailyReportRequest.getProjectId());
         if (dailyReportRepository.existsByProjectAndUserAndLocalDateTimeBetween(
                 project, user, startOfDay, endOfDay)) {
             throw new DuplicateReportException("Aynı projeye ve kullanıcıya ait rapor zaten mevcut.");

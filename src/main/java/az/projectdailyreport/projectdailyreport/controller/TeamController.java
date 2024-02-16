@@ -46,10 +46,9 @@ public class TeamController {
     public ResponseEntity<TeamResponse> updateTeamAndUsers(
             @PathVariable Long teamId,
             @RequestBody TeamResponse teamResponse,
-            @RequestParam(required = false) List<Long> userIdsToAdd,
-            @RequestParam(required = false) List<Long> userIdsToRemove
+            @RequestParam(required = false) List<Long> userIdsToAdd
     ) {
-        TeamResponse updatedTeam = teamService.updateTeamAndUsers(teamId, teamResponse, userIdsToAdd, userIdsToRemove);
+        TeamResponse updatedTeam = teamService.updateTeamAndUsers(teamId, teamResponse, userIdsToAdd);
         return ResponseEntity.ok(updatedTeam);
     }
 

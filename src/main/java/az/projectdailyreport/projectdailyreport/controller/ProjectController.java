@@ -35,9 +35,8 @@ public class ProjectController {
     @PutMapping("/{projectId}")
     public ResponseEntity<String> updateProjectAndUsers(@PathVariable Long projectId,
                                                          @RequestBody ProjectUpdateDto projectUpdateDto,
-                                                         @RequestParam(required = false) List<Long> userIdsToAdd,
-                                                         @RequestParam(required = false) List<Long> userIdsToRemove) {
-        Project updatedProject = projectService.updateProjectAndUsers(projectId, projectUpdateDto, userIdsToAdd, userIdsToRemove);
+                                                         @RequestParam(required = false) List<Long> userIdsToAdd) {
+        Project updatedProject = projectService.updateProjectAndUsers(projectId, projectUpdateDto, userIdsToAdd);
         return ResponseEntity.ok("Project successfully Updated .");
     }
     @GetMapping("/search")

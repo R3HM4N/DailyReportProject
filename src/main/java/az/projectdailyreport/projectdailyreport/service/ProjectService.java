@@ -11,7 +11,7 @@ import java.util.List;
 public interface ProjectService {
 
     ProjectResponse createProject(ProjectRequest projectRequest);
-    Project updateProjectAndUsers(Long projectId, ProjectUpdateDto projectUpdateDto, List<Long> userIdsToAdd, List<Long> userIdsToRemove);
+    Project updateProjectAndUsers(Long projectId, ProjectUpdateDto newProjectName, List<Long> newUserIds);
     Page<ProjectFilterDto> searchProjectsByName(String projectName,Pageable pageable);
 
     List<ProjectGetDto> getAllProject();
