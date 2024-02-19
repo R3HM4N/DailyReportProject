@@ -85,6 +85,7 @@ public class TeamServiceImpl implements TeamService {
         Team existingTeam = teamRepository.findById(teamId)
                 .orElseThrow(() -> new TeamNotFoundException(teamId));
         existingTeam.setTeamName(newTeamName.getTeamName());
+        if (newUserIds!=null){
         for (User user : existingTeam.getUsers()) {
             user.setTeam(null);
         }
@@ -95,7 +96,7 @@ public class TeamServiceImpl implements TeamService {
                     .orElseThrow(() -> new UserNotFoundException(userId));
             user.setTeam(existingTeam);
             existingTeam.getUsers().add(user);
-        }
+        }}
 
         existingTeam = teamRepository.save(existingTeam);
 
