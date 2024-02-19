@@ -17,14 +17,10 @@ public class RoleController {
     private final RoleService roleService;
 
 
-    @GetMapping("/getRoleForSuperAdmin")
+    @GetMapping("")
     public List<Role> getAllRoles() {
         return roleService.getAllRolesExceptOne();
     }
 
 
-    @GetMapping("/getRoleForAdmin")
-    public List<Role> getRolesExceptSuperAdminAndAdmin() {
-        return roleService.getAllRolesExceptSuperAdminAndAdmin();
     }
-}

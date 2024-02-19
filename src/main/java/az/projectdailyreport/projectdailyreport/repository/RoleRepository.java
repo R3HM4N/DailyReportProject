@@ -13,8 +13,6 @@ import java.util.List;
 public interface RoleRepository extends JpaRepository<Role,Long> {
 
     Role findByRoleName(String roleName);
-    @Query("SELECT r FROM Role r WHERE r.id != 1")
-    List<Role> findAllExceptOne();
     boolean existsByRoleName(RoleName roleName);
 
     @Query("SELECT r FROM Role r WHERE r.roleName NOT IN (:excludedRoles)")
