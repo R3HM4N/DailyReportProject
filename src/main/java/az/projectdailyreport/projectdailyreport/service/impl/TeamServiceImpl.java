@@ -84,11 +84,7 @@ public class TeamServiceImpl implements TeamService {
     public TeamResponse updateTeamAndUsers(Long teamId, TeamResponse newTeamName, List<Long> newUserIds) {
         Team existingTeam = teamRepository.findById(teamId)
                 .orElseThrow(() -> new TeamNotFoundException(teamId));
-
-        // Takım adını güncelle
         existingTeam.setTeamName(newTeamName.getTeamName());
-
-        // Eski kullanıcıları kaldır
         for (User user : existingTeam.getUsers()) {
             user.setTeam(null);
         }
@@ -105,8 +101,6 @@ public class TeamServiceImpl implements TeamService {
 
         TeamResponse updatedTeamResponse = new TeamResponse();
         updatedTeamResponse.setTeamName(existingTeam.getTeamName());
-        // Diğer özellikleri buraya ekleyin
-
         return updatedTeamResponse;
     }
 

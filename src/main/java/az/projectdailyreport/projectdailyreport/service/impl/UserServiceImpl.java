@@ -239,7 +239,7 @@ public class UserServiceImpl implements UserService {
             if ((user1.getRoleName().equals(RoleName.ADMIN)) && userOptional.get().getRoleName().equals(RoleName.SUPER_ADMIN) ||
                     (user1.getRoleName().equals(RoleName.ADMIN) && !user1.getId().equals(userId))) {
 
-                throw new EntityNotFoundException("Password change failed: " + userId);
+                throw new MailAlreadyExistsException("Password change failed: " + userId);
 
             } else {
                 userRepository.save(existingUser);
@@ -247,7 +247,7 @@ public class UserServiceImpl implements UserService {
             return "Update is complete";
 
         } else {
-            throw new EntityNotFoundException("Password change failed: " + userId);
+            throw new PasswordsNotMatchException("Password change failed because password and confirm password are not the same: " );
         }
     }
 
