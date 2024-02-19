@@ -103,23 +103,20 @@ public class ProjectServiceImpl implements ProjectService {
         Project existingProject = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
-        // Proje adını güncelle
         existingProject.setProjectName(newProjectName.getProjectName());
 
-        // Eski kullanıcıları kaldır
-        for (User user : existingProject.getUsers()) {
-            user.getProjects().remove(existingProject);
+        if (newUserIds!=null) {
+            for (User user : existingProject.getUsers()) {
+                user.getProjects().remove(existingProject);
+            }
+            existingProject.getUsers().clear();
+            for (Long userId : newUserIds) {
+                User user = userRepository.findById(userId)
+                        .orElseThrow(() -> new UserNotFoundException(userId));
+                existingProject.getUsers().add(user);
+                user.getProjects().add(existingProject);
+            }
         }
-        existingProject.getUsers().clear();
-
-        // Yeni kullanıcıları ekle
-        for (Long userId : newUserIds) {
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new UserNotFoundException(userId));
-            existingProject.getUsers().add(user);
-            user.getProjects().add(existingProject);
-        }
-
         return projectRepository.save(existingProject);
     }
 
