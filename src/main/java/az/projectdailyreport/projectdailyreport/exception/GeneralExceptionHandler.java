@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 
+import static org.springframework.http.HttpStatus.*;
+
 @RestControllerAdvice
 public class GeneralExceptionHandler {
 
@@ -14,232 +16,233 @@ public class GeneralExceptionHandler {
     public ResponseEntity<ExceptionResponse> handleMailValidation(MailValidationException exception) {
         ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST,
+                BAD_REQUEST.value(),
+                BAD_REQUEST,
                 exception.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ProjectExistsException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ExceptionResponse handleProjectExistsException(ProjectExistsException exception) {
-        return new ExceptionResponse(
+    public ResponseEntity<ExceptionResponse> handleProjectExistsException(ProjectExistsException exception) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.CONFLICT.value(),
-                HttpStatus.CONFLICT,
+                CONFLICT.value(),
+                CONFLICT,
                 exception.getMessage());
+        return new ResponseEntity<>(exceptionResponse, CONFLICT);
     }
     @ExceptionHandler(TeamExistsException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseEntity<ExceptionResponse> handleTeamExistsException(TeamExistsException exception) {
         ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.CONFLICT.value(),
-                HttpStatus.CONFLICT,
+                CONFLICT.value(),
+                CONFLICT,
                 exception.getMessage());
 
-        return new ResponseEntity<>(response, HttpStatus.CONFLICT);}
+        return new ResponseEntity<>(response, CONFLICT);}
 
     @ExceptionHandler(ProjectNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ExceptionResponse handleProjectNotFoundException(ProjectNotFoundException exception) {
-        return new ExceptionResponse(
+    public ResponseEntity<ExceptionResponse> handleProjectNotFoundException(ProjectNotFoundException exception) {
+        ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND,
+                NOT_FOUND.value(),
+                NOT_FOUND,
                 exception.getMessage());
+
+        return new ResponseEntity<>(response, NOT_FOUND);
     }
     @ExceptionHandler(ProjectAlreadyDeletedException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionResponse handleProjectAlreadyDeletedException(ProjectAlreadyDeletedException exception) {
-        return new ExceptionResponse(
+    public ResponseEntity<ExceptionResponse> handleProjectAlreadyDeletedException(ProjectAlreadyDeletedException exception) {
+        ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST,
+                BAD_REQUEST.value(),
+                BAD_REQUEST,
                 exception.getMessage());
+        return new ResponseEntity<>(response, BAD_REQUEST);
     }
 
 
     @ExceptionHandler(UserAlreadyDeletedException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionResponse handleUserAlreadyDeletedException(UserAlreadyDeletedException exception) {
-        return new ExceptionResponse(
+    public ResponseEntity<ExceptionResponse> handleUserAlreadyDeletedException(UserAlreadyDeletedException exception) {
+        ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST,
+                BAD_REQUEST.value(),
+                BAD_REQUEST,
                 exception.getMessage());
+        return new ResponseEntity<>(response, BAD_REQUEST);
     }
 
 
     @ExceptionHandler(UserNotFoundException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionResponse handleUserNotFoundException(UserNotFoundException exception) {
-        return new ExceptionResponse(
+    public ResponseEntity<ExceptionResponse> handleUserNotFoundException(UserNotFoundException exception) {
+        ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST,
+                BAD_REQUEST.value(),
+                BAD_REQUEST,
                 exception.getMessage());
+        return new ResponseEntity<>(response, BAD_REQUEST);
     }
 
     @ExceptionHandler(TeamNotFoundException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionResponse handleTeamNotFoundException(TeamNotFoundException exception) {
-        return new ExceptionResponse(
+    public ResponseEntity<ExceptionResponse> handleTeamNotFoundException(TeamNotFoundException exception) {
+        ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST,
+                BAD_REQUEST.value(),
+                BAD_REQUEST,
                 exception.getMessage());
+        return new ResponseEntity<>(response, BAD_REQUEST);
     }
 
     @ExceptionHandler(TeamAlreadyDeletedException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionResponse handleTeamAlreadyDeletedException(TeamAlreadyDeletedException exception) {
-        return new ExceptionResponse(
+    public ResponseEntity<ExceptionResponse> handleTeamAlreadyDeletedException(TeamAlreadyDeletedException exception) {
+        ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST,
+                BAD_REQUEST.value(),
+                BAD_REQUEST,
                 exception.getMessage());
+        return new ResponseEntity<>(response, BAD_REQUEST);
     }
 
     @ExceptionHandler(DuplicateReportException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionResponse handleDuplicateReportException(DuplicateReportException exception) {
-        return new ExceptionResponse(
+    public ResponseEntity<ExceptionResponse> handleDuplicateReportException(DuplicateReportException exception) {
+        ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST,
+                BAD_REQUEST.value(),
+                BAD_REQUEST,
                 exception.getMessage());
+        return new ResponseEntity<>(response, BAD_REQUEST);
     }
 
     @ExceptionHandler(ReportNotFoundException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionResponse handleReportNotFoundException (ReportNotFoundException  exception) {
-        return new ExceptionResponse(
+    public ResponseEntity<ExceptionResponse> handleReportNotFoundException (ReportNotFoundException  exception) {
+        ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST,
+                BAD_REQUEST.value(),
+                BAD_REQUEST,
                 exception.getMessage());
+        return new ResponseEntity<>(response, BAD_REQUEST);
     }
     @ExceptionHandler(DailyReportUpdateException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionResponse handleDailyReportUpdateException  (DailyReportUpdateException   exception) {
-        return new ExceptionResponse(
+    public ResponseEntity<ExceptionResponse> handleDailyReportUpdateException  (DailyReportUpdateException   exception) {
+        ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST,
+                BAD_REQUEST.value(),
+                BAD_REQUEST,
                 exception.getMessage());
+        return new ResponseEntity<>(response, BAD_REQUEST);
     }
 
     @ExceptionHandler(UserAlreadyRemovedException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionResponse handleUserAlreadyRemovedException  (UserAlreadyRemovedException   exception) {
-        return new ExceptionResponse(
+    public  ResponseEntity<ExceptionResponse> handleUserAlreadyRemovedException  (UserAlreadyRemovedException   exception) {
+        ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST,
+                BAD_REQUEST.value(),
+                BAD_REQUEST,
                 exception.getMessage());
+        return new ResponseEntity<>(response, BAD_REQUEST);
     }
 
     @ExceptionHandler(UserAlreadyAddedException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionResponse handleUserAlreadyAddedException  (UserAlreadyAddedException   exception) {
-        return new ExceptionResponse(
+    public ResponseEntity<ExceptionResponse> handleUserAlreadyAddedException  (UserAlreadyAddedException   exception) {
+        ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST,
+                BAD_REQUEST.value(),
+                BAD_REQUEST,
                 exception.getMessage());
+        return new ResponseEntity<>(response, BAD_REQUEST);
     }
 
     @ExceptionHandler(TeamNotEmptyException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public  ExceptionResponse handleTeamNotEmptyException (TeamNotEmptyException  exception){
-        return new ExceptionResponse(
+    public  ResponseEntity<ExceptionResponse> handleTeamNotEmptyException (TeamNotEmptyException  exception){
+        ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST,
+                BAD_REQUEST.value(),
+                BAD_REQUEST,
                 exception.getMessage());
+        return new ResponseEntity<>(response, BAD_REQUEST);
 
     }
 
     @ExceptionHandler(MailAlreadyExistsException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public  ExceptionResponse handleMailAlreadyExistsException (MailAlreadyExistsException  exception){
-        return new ExceptionResponse(
+    public ResponseEntity<ExceptionResponse> handleMailAlreadyExistsException (MailAlreadyExistsException  exception){
+        ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST,
+                BAD_REQUEST.value(),
+                BAD_REQUEST,
                 exception.getMessage());
+        return new ResponseEntity<>(response, BAD_REQUEST);
 
     }
 
 
     @ExceptionHandler(SuperAdminException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public  ExceptionResponse handleSuperAdminException (SuperAdminException  exception){
-        return new ExceptionResponse(
+    public   ResponseEntity<ExceptionResponse> handleSuperAdminException (SuperAdminException  exception){
+        ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST,
+                BAD_REQUEST.value(),
+                BAD_REQUEST,
                 exception.getMessage());
+        return new ResponseEntity<>(response, BAD_REQUEST);
 
     }
 
 
     @ExceptionHandler(RoleException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public  ExceptionResponse handleRoleException (RoleException  exception){
-        return new ExceptionResponse(
+    public  ResponseEntity<ExceptionResponse>  handleRoleException (RoleException  exception){
+        ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST,
+                BAD_REQUEST.value(),
+                BAD_REQUEST,
                 exception.getMessage());
+        return new ResponseEntity<>(response, BAD_REQUEST);
 
     }
 
 
 
     @ExceptionHandler(InvalidPasswordException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public  ExceptionResponse handleInvalidPasswordException (InvalidPasswordException  exception){
-        return new ExceptionResponse(
+    public  ResponseEntity<ExceptionResponse> handleInvalidPasswordException (InvalidPasswordException  exception){
+        ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST,
+                BAD_REQUEST.value(),
+                BAD_REQUEST,
                 exception.getMessage());
+        return new ResponseEntity<>(response, BAD_REQUEST);
 
     }
 
     @ExceptionHandler(EmailNotSentException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public  ExceptionResponse handleEmailNotSentException (EmailNotSentException  exception){
-        return new ExceptionResponse(
+    public  ResponseEntity<ExceptionResponse> handleEmailNotSentException (EmailNotSentException  exception){
+        ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST,
+                BAD_REQUEST.value(),
+                BAD_REQUEST,
                 exception.getMessage());
+        return new ResponseEntity<>(response, BAD_REQUEST);
 
     }
 
     @ExceptionHandler(InvalidOtpException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public  ExceptionResponse handleInvalidOtpException (InvalidOtpException  exception){
-        return new ExceptionResponse(
+    public  ResponseEntity<ExceptionResponse> handleInvalidOtpException (InvalidOtpException  exception){
+        ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST,
+                BAD_REQUEST.value(),
+                BAD_REQUEST,
                 exception.getMessage());
+        return new ResponseEntity<>(response, BAD_REQUEST);
 
     }
 
 
     @ExceptionHandler(PasswordsNotMatchException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public  ExceptionResponse handlePasswordsNotMatchException (PasswordsNotMatchException  exception){
-        return new ExceptionResponse(
+    public  ResponseEntity<ExceptionResponse> handlePasswordsNotMatchException (PasswordsNotMatchException  exception){
+        ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST,
+                BAD_REQUEST.value(),
+                BAD_REQUEST,
                 exception.getMessage());
+        return new ResponseEntity<>(response, BAD_REQUEST);
+
 
     }
 
