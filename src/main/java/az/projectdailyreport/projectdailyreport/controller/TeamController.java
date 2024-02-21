@@ -59,11 +59,7 @@ public class TeamController {
         return new ResponseEntity<>(createdTeam, HttpStatus.CREATED);
     }
 
-    private TeamDTO convertToDto(Team team) {
-        ModelMapper modelMapper = new ModelMapper();
-        return modelMapper.map(team, TeamDTO.class);
 
-    }
 
     @DeleteMapping("/{teamId}")
     public ResponseEntity<String> deleteTeam(@PathVariable Long teamId) {

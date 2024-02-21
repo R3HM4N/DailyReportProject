@@ -42,7 +42,9 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public TeamGetByIdDto getById(Long id) {
         Team team = teamRepository.findById(id).orElse(null);
-        List<TeamUserDto> userDtos = team.getUsers().stream().map(x -> {
+        List<TeamUserDto> userDtos = team.getUsers().stream()
+                .filter(user -> !user.isDeleted())
+                .map(x -> {
             TeamUserDto dt = TeamUserDto.builder()
                     .id(x.getId())
                     .firstName(x.getFirstName())
