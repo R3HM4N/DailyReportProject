@@ -87,15 +87,11 @@ public class UserServiceImpl implements UserService {
         if (user1.getRoleName().equals(RoleName.SUPER_ADMIN)) {
             if (createUserRequest.getRole().getId() == 2) {
                 user.setRoleName(RoleName.ADMIN);
-            } else if (createUserRequest.getRole().getId() == 3) {
-                user.setRoleName(RoleName.HEAD);
-            } else if (createUserRequest.getRole().getId() == 4) {
+            }  else if (createUserRequest.getRole().getId() == 4) {
                 user.setRoleName(RoleName.EMPLOYEE);
             }
         } else if (user1.getRoleName().equals(RoleName.ADMIN)) {
-            if (createUserRequest.getRole().getId() == 3) {
-                user.setRoleName(RoleName.HEAD);
-            } else if (createUserRequest.getRole().getId() == 4) {
+            if  (createUserRequest.getRole().getId() == 4) {
                 user.setRoleName(RoleName.EMPLOYEE);
             }
         }
@@ -200,25 +196,36 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDTO updateUser(Long userId, UserUpdateDTO updatedUserDTO) {
         Optional<User> userOptional = userRepository.findById(userId);
+        User user1 = getSignedInUser();
+
 
         if (userOptional.isPresent()) {
-            User existingUser = userOptional.get();
+            Optional<Team> team = teamRepository.findById(updatedUserDTO.getTeamId());
+            Optional<Role> role = roleService.findRoleById(updatedUserDTO.getRoleId());
 
-            User updatedUser = User.builder()
-                    .id(existingUser.getId())
-                    .firstName(updatedUserDTO.getFirstName())
-                    .lastName(updatedUserDTO.getLastName())
-                    .mail(updatedUserDTO.getEmail())
-                    .build();
-                Optional<Team> team = teamRepository.findById(updatedUserDTO.getTeamId());
-                team.ifPresent(existingUser::setTeam);
-                Optional<Role> role = roleService.findRoleById(updatedUserDTO.getRoleId());
-                role.ifPresent(existingUser::setRole);
-
-
+            User updatedUser = userOptional.get();
+            updatedUser.setFirstName(updatedUserDTO.getFirstName());
+            updatedUser.setLastName(updatedUserDTO.getLastName());
+            updatedUser.setMail(updatedUserDTO.getEmail());
+            updatedUser.setRole(role.get());
+            updatedUser.setTeam(team.get());
+            if (user1.getRoleName().equals(RoleName.ADMIN) && (updatedUserDTO.getRoleId() == 2 || updatedUserDTO.getRoleId() == 1)) {
+                throw new RoleException("Yoou don't have access to create Admin and SuperAdmin.");
+            }
+            if (user1.getRoleName().equals(RoleName.SUPER_ADMIN)) {
+                if (updatedUserDTO.getRoleId()== 2) {
+                    updatedUser.setRoleName(RoleName.ADMIN);
+                } else if (updatedUserDTO.getRoleId()== 4) {
+                    updatedUser.setRoleName(RoleName.EMPLOYEE);
+                }
+            } else if (user1.getRoleName().equals(RoleName.ADMIN)) {
+                 if (updatedUserDTO.getRoleId() == 4) {
+                    updatedUser.setRoleName(RoleName.EMPLOYEE);
+                }
+            }
             userRepository.save(updatedUser);
 
-            return UserMapper.toDTO(existingUser);
+            return UserMapper.toDTO(updatedUser);
         } else {
             throw new EntityNotFoundException("User not found with id: " + userId);
         }
