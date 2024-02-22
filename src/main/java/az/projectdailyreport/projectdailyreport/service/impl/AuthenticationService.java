@@ -49,7 +49,7 @@ public class AuthenticationService {
         var jwtToken = jwtService.createToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);
-        saveUserToken(user, jwtToken);
+        saveUserToken(user, refreshToken);
 
         return AuthenticationResponse.builder()
                 .id(user.getId())
@@ -112,7 +112,7 @@ public class AuthenticationService {
         }
     }
 
-    public String generateAccessToken(String refreshToken) {
+    public AuthenticationResponse generateAccessToken(String refreshToken) {
         String mail = jwtService.extractUsername(refreshToken);
         if (mail != null) {
             var user = repository.findByEmail(mail)
@@ -121,7 +121,11 @@ public class AuthenticationService {
                 var accessToken = jwtService.createToken(user);
                 revokeAllUserTokens(user);
                 saveUserToken(user, accessToken);
-                return accessToken;
+                return AuthenticationResponse.builder()
+                        .id(user.getId())
+                        .accessToken(accessToken)
+                        .refreshToken(refreshToken)
+                        .build();
             }
         }
         return null;

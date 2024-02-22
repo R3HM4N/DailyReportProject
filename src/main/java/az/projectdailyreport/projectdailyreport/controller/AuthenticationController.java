@@ -2,6 +2,7 @@ package az.projectdailyreport.projectdailyreport.controller;
 
 import az.projectdailyreport.projectdailyreport.dto.request.AuthenticationRequest;
 import az.projectdailyreport.projectdailyreport.dto.request.AuthenticationResponse;
+import az.projectdailyreport.projectdailyreport.dto.request.RefreshToken;
 import az.projectdailyreport.projectdailyreport.exception.UserNotFoundException;
 import az.projectdailyreport.projectdailyreport.service.impl.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,9 +30,9 @@ public class AuthenticationController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<AuthenticationResponse> refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException, IOException {
-        service.refreshToken(request, response);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<AuthenticationResponse>  refreshToken( @RequestBody RefreshToken request) {
+
+        return ResponseEntity.ok(service.generateAccessToken(request.getRefreshToken()));
     }
 
 }
