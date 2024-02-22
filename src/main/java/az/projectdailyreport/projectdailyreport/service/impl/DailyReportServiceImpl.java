@@ -98,6 +98,13 @@ public class DailyReportServiceImpl implements DailyReportService {
         List<DailyReport> dailyReports = dailyReportRepository.findAll();
         return mapToAdminDTOList(dailyReports);
     }
+    @Override
+    public DailyReportAdmin getById(Long reportId) {
+        DailyReport report = dailyReportRepository.findById(reportId)
+                .orElseThrow(() -> new ReportNotFoundException("Daily Report not found with id: " + reportId));
+
+        return mapToAdminDTO(report);
+    }
 
     private List<DailyReportUser> mapToUserDTOList(List<DailyReport> dailyReports) {
 
@@ -119,9 +126,8 @@ public class DailyReportServiceImpl implements DailyReportService {
                 .id(dailyReport.getId())
                 .userId(dailyReport.getUser().getId())
                 .localDateTime(dailyReport.getLocalDateTime())
-                .reportText(dailyReport.getReportText())  // Raporu gizle, isteğe göre farklı bir değer de atanabilir
+                .reportText(dailyReport.getReportText())
                 .project(mapProjectToDTO(dailyReport.getProject()))
-                // Diğer alanlar
                 .build();
     }
 

@@ -23,5 +23,6 @@ public interface DailyReportService {
              List<Long> userIds, LocalDate startDate, LocalDate endDate,
              List<Long> projectIds, Pageable pageable);
      DailyReportDTO updateDailyReport(Long reportId, DailyReportUpdate updatedReportText);
+     DailyReportAdmin getById(Long reportId);
 }
 

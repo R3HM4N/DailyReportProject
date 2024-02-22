@@ -4,6 +4,7 @@ import az.projectdailyreport.projectdailyreport.dto.dailyreport.DailyReportAdmin
 import az.projectdailyreport.projectdailyreport.dto.dailyreport.DailyReportDTO;
 import az.projectdailyreport.projectdailyreport.dto.dailyreport.DailyReportUpdate;
 import az.projectdailyreport.projectdailyreport.dto.dailyreport.DailyReportUser;
+import az.projectdailyreport.projectdailyreport.dto.project.ProjectFilterDto;
 import az.projectdailyreport.projectdailyreport.dto.request.DailyReportRequest;
 import az.projectdailyreport.projectdailyreport.model.DailyReport;
 import az.projectdailyreport.projectdailyreport.model.User;
@@ -14,6 +15,7 @@ import az.projectdailyreport.projectdailyreport.service.impl.ExcelExportService;
 import ch.qos.logback.core.model.Model;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -126,6 +128,11 @@ public class DailyReportController {
         return ResponseEntity.ok(filteredReports);
     }
 
+    @GetMapping("/{report_id}")
+        public ResponseEntity<DailyReportAdmin> getById(@PathVariable Long report_id){
+        DailyReportAdmin reportAdmin =dailyReportService.getById(report_id);
+        return ResponseEntity.ok(reportAdmin);
+    }
 
 
 

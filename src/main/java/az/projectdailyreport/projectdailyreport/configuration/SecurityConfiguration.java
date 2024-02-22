@@ -52,6 +52,8 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.PUT,"/api/project/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
                                 .requestMatchers(HttpMethod.GET,"/api/report/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD","EMPLOYEE")
                                 .requestMatchers(HttpMethod.POST,"/api/report/{reportId}/").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD","EMPLOYEE")
+                                .requestMatchers(HttpMethod.GET,"/api/report/{report_id}/").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD","EMPLOYEE")
+
                                 .requestMatchers(HttpMethod.GET,"/api/report/user/reports").hasAuthority("EMPLOYEE")
                                 .requestMatchers(HttpMethod.GET,"/api/report/admin/filtir").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD")
                                 .requestMatchers(HttpMethod.GET,"/api/report/export-excel").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD")
