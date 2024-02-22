@@ -49,7 +49,7 @@ public class AuthenticationService {
         var jwtToken = jwtService.createToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);
-        saveUserToken(user, refreshToken);
+        saveUserToken(user, jwtToken);
 
         return AuthenticationResponse.builder()
                 .id(user.getId())
@@ -110,10 +110,15 @@ public class AuthenticationService {
                 new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
         }
-    }
+    }public String generateAccessToken(String refreshToken,HttpServletRequest request, HttpServletResponse response) {
+        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        final String mail;
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return null;
+        }
+        refreshToken = authHeader.substring(7);
 
-    public AuthenticationResponse generateAccessToken(String refreshToken) {
-        String mail = jwtService.extractUsername(refreshToken);
+         mail = jwtService.extractUsername(refreshToken);
         if (mail != null) {
             var user = repository.findByEmail(mail)
                     .orElseThrow(() -> new MailAlreadyExistsException("User not found"));
@@ -121,16 +126,11 @@ public class AuthenticationService {
                 var accessToken = jwtService.createToken(user);
                 revokeAllUserTokens(user);
                 saveUserToken(user, accessToken);
-                return AuthenticationResponse.builder()
-                        .id(user.getId())
-                        .accessToken(accessToken)
-                        .refreshToken(refreshToken)
-                        .build();
-            }
-        }
-        return null;
+                return accessToken;
+            }}
+                return null;}
     }
-}
+
 
 
 
