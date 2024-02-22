@@ -135,6 +135,7 @@ public class UserServiceImpl implements UserService {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             user.setDeleted(true);
+            user.setStatus(Status.INACTIVE);
             userRepository.save(user);
         } else {
             throw new EntityNotFoundException("User not found with id: " + userId);
