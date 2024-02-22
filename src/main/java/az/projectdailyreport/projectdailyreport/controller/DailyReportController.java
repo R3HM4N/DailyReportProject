@@ -94,9 +94,10 @@ public class DailyReportController {
 //    }
 
     @GetMapping("/user/reports")
-    public ResponseEntity<List<DailyReportUser>> getUserReportsBetweenDates(
+    public ResponseEntity<Page<DailyReportUser>> getUserReportsBetweenDates(
             @RequestParam(required = false) LocalDate startDate,
             @RequestParam(required = false) LocalDate endDate,
+            @RequestParam(required = false) List<Long> projectIds,
             @RequestParam(name = "pageNumber", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer size,
             @RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
@@ -107,7 +108,7 @@ public class DailyReportController {
 
         User signedInUser = userService.getSignedInUser();
         Optional<User> userOptional = userRepository.findById(signedInUser.getId());
-        List<DailyReportUser> reports = dailyReportService.getUserReportsBetweenDates(userOptional.get().getId(), startDate, endDate, pageable);
+        Page<DailyReportUser> reports = dailyReportService.getUserReportsBetweenDates(userOptional.get().getId(), startDate, endDate,projectIds, pageable);
         return ResponseEntity.ok(reports);
     }
 

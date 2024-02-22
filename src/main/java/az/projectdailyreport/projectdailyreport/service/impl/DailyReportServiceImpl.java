@@ -89,15 +89,7 @@ public class DailyReportServiceImpl implements DailyReportService {
         return modelMapper.map(updatedReport, DailyReportDTO.class);
     }
 
-    public List<DailyReportUser> getAllDailyReportsForUser(Long id) {
-        List<DailyReport> dailyReports = dailyReportRepository.findByUser_Id(id);
-        return mapToUserDTOList(dailyReports);
-    }
 
-    public List<DailyReportAdmin> getAllDailyReportsForAdmin() {
-        List<DailyReport> dailyReports = dailyReportRepository.findAll();
-        return mapToAdminDTOList(dailyReports);
-    }
     @Override
     public DailyReportAdmin getById(Long reportId) {
         DailyReport report = dailyReportRepository.findById(reportId)
@@ -163,9 +155,14 @@ public class DailyReportServiceImpl implements DailyReportService {
         return filteredReports.map(this::mapToAdminDTO);}
     }
     @Override
-    public List<DailyReportUser> getUserReportsBetweenDates(Long userId, LocalDate startDate, LocalDate endDate, Pageable pageable) {
-        List<DailyReport> filteredReports = dailyReportRepository.findUserReportsBetweenDates(userId, startDate, endDate, pageable);
-    return mapToUserDTOList(filteredReports);
-    }
+    public Page<DailyReportUser> getUserReportsBetweenDates(Long userId, LocalDate startDate, LocalDate endDate,List<Long> projectIds, Pageable pageable) {
+        if (startDate == null && endDate == null && projectIds == null) {
+            Page<DailyReport> getall = dailyReportRepository.findAll(pageable);
+            return getall.map(this::mapToUserDTO);
+        } else {
 
+            Page<DailyReport> filteredReports = dailyReportRepository.findUserReportsBetweenDates(userId, startDate, endDate, projectIds, pageable);
+            return filteredReports.map(this::mapToUserDTO);
+        }
+    }
 }

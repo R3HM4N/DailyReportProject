@@ -24,7 +24,7 @@ public interface DailyReportRepository  extends JpaRepository<DailyReport,Long> 
 
     @Query("SELECT dr FROM DailyReport dr " +
             "WHERE (:userIds IS NULL OR (:userIds IS NOT NULL AND dr.user.id IN (:userIds))) " +
-            "AND (((:startDate IS NULL OR DATE(dr.localDateTime) >= :startDate)" +
+            "AND(((:startDate IS NULL OR DATE(dr.localDateTime) >= :startDate)" +
             " AND (:endDate IS NULL OR DATE(dr.localDateTime) <= :startDate))" +
             "   OR DATE(dr.localDateTime) BETWEEN :startDate AND :endDate ) " +
             "AND (:projectIds IS NULL OR (:projectIds IS NOT NULL AND dr.project.id IN (:projectIds)))")
@@ -37,19 +37,21 @@ public interface DailyReportRepository  extends JpaRepository<DailyReport,Long> 
     );
 
 
+
     boolean existsByProjectAndUserAndLocalDateTimeBetween(Project project, User user, LocalDateTime start, LocalDateTime end);
 
     List<DailyReport> findByUser_Id(Long userId);
     @Query("SELECT dr FROM DailyReport dr " +
-            "WHERE (:userId IS NULL OR dr.user.id = :userId) " +
-            "AND ((:startDate IS NULL AND :endDate IS NULL) OR " +
-            "(:startDate IS NULL AND :endDate IS NOT NULL AND DATE(dr.localDateTime) <= :endDate) OR " +
-            "(:startDate IS NOT NULL AND :endDate IS NULL AND DATE(dr.localDateTime) >= :startDate) OR " +
-            "(DATE(dr.localDateTime) BETWEEN :startDate AND :endDate))")
-    List<DailyReport> findUserReportsBetweenDates(
+            "WHERE (:userId IS NULL OR (:userId IS NOT NULL AND dr.user.id IN (:userId))) " +
+            "AND (((:startDate IS NULL OR DATE(dr.localDateTime) >= :startDate)" +
+            " AND (:endDate IS NULL OR DATE(dr.localDateTime) <= :startDate))" +
+            "   OR DATE(dr.localDateTime) BETWEEN :startDate AND :endDate ) " +
+            "AND (:projectIds IS NULL OR (:projectIds IS NOT NULL AND dr.project.id IN (:projectIds)))")
+    Page<DailyReport> findUserReportsBetweenDates(
             @Param("userId") Long userId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
+            @Param("projectIds") List<Long> projectIds,
             Pageable pageable
     );
 

@@ -16,9 +16,8 @@ import java.util.List;
 
 public interface DailyReportService {
      DailyReportDTO createDailyReport(DailyReportRequest dailyReportRequest, User user);
-     List<DailyReportUser> getAllDailyReportsForUser(Long id);
-     List<DailyReportAdmin> getAllDailyReportsForAdmin();
-     List<DailyReportUser> getUserReportsBetweenDates(Long userId, LocalDate startDate, LocalDate endDate, Pageable pageable);
+
+     Page<DailyReportUser> getUserReportsBetweenDates(Long userId, LocalDate startDate, LocalDate endDate,List<Long> projectIds, Pageable pageable);
      Page<DailyReportAdmin> getFilteredDailyReportsForAdmin(
              List<Long> userIds, LocalDate startDate, LocalDate endDate,
              List<Long> projectIds, Pageable pageable);
