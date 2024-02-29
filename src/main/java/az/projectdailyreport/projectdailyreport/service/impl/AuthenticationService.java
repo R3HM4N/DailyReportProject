@@ -55,6 +55,7 @@ public class AuthenticationService {
                 .id(user.getId())
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
+                .expiredDate(jwtService.extracExpiration(jwtToken))
                 .build();
     }
 

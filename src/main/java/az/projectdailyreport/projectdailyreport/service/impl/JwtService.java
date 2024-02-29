@@ -55,6 +55,9 @@ public class JwtService {
                 .parseClaimsJws(token)
                 .getBody();
     }
+    public Date extracExpiration (String token){
+        return extractClaim(token,Claims::getExpiration);
+    }
 
     public String createToken(UserDetails user) {
         String email= user.getUsername();

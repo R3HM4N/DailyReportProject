@@ -98,13 +98,13 @@ public class DailyReportController {
             @RequestParam(required = false) LocalDate startDate,
             @RequestParam(required = false) LocalDate endDate,
             @RequestParam(required = false) List<Long> projectIds,
-            @RequestParam(name = "pageNumber", defaultValue = "0") Integer page,
+            @RequestParam(name = "pageNumber", defaultValue = "1") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer size,
             @RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
             @RequestParam(name = "sortOrder", defaultValue = "ASC") String sortOrder    )
 
     {
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(sortOrder), sortBy);
+        Pageable pageable = PageRequest.of(page-1, size, Sort.Direction.fromString(sortOrder), sortBy);
 
         User signedInUser = userService.getSignedInUser();
         Optional<User> userOptional = userRepository.findById(signedInUser.getId());
@@ -118,12 +118,12 @@ public class DailyReportController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) List<Long> projectIds,
-            @RequestParam(name = "pageNumber", defaultValue = "0") Integer page,
+            @RequestParam(name = "pageNumber", defaultValue = "1") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer size,
             @RequestParam(name = "sortBy", defaultValue = "id", required = false) String sortBy,
             @RequestParam(name = "sortOrder", defaultValue = "ASC") String sortOrder) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(sortOrder), sortBy);
+        Pageable pageable = PageRequest.of(page-1, size, Sort.Direction.fromString(sortOrder), sortBy);
 
         Page<DailyReportAdmin> filteredReports = dailyReportService.getFilteredDailyReportsForAdmin(userIds, startDate, endDate, projectIds, pageable);
         return ResponseEntity.ok(filteredReports);
@@ -143,13 +143,13 @@ public class DailyReportController {
                                           @RequestParam(required = false) LocalDate startDate,
                                           @RequestParam(required = false) LocalDate endDate,
                                           @RequestParam(required = false) List<Long> projectIds,
-                                          @RequestParam(name = "pageNumber", defaultValue = "0") Integer page,
+                                          @RequestParam(name = "pageNumber", defaultValue = "1") Integer page,
                                           @RequestParam(name = "pageSize", defaultValue = "10") Integer size,
                                           @RequestParam(name = "sortBy", defaultValue = "id", required = false) String sortBy,
                                           @RequestParam(name = "sortOrder", defaultValue = "ASC") String sortOrder
                                            ) throws IOException {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(sortOrder), sortBy);
+        Pageable pageable = PageRequest.of(page-1, size, Sort.Direction.fromString(sortOrder), sortBy);
 
         response.setContentType("application/vnd.ms-excel");
         response.setHeader("Content-Disposition", "attachment; filename=daily-reports.xlsx");

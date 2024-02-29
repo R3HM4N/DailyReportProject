@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Date;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -18,6 +21,8 @@ public class AuthenticationResponse {
         private String accessToken;
         @JsonProperty("refresh_token")
         private String refreshToken;
+        @JsonProperty("expired_date")
+        private Date expiredDate;
 
 
 }

@@ -3,7 +3,9 @@ package az.projectdailyreport.projectdailyreport.controller;
 import az.projectdailyreport.projectdailyreport.dto.project.*;
 import az.projectdailyreport.projectdailyreport.dto.request.ProjectRequest;
 import az.projectdailyreport.projectdailyreport.model.Project;
+import az.projectdailyreport.projectdailyreport.model.User;
 import az.projectdailyreport.projectdailyreport.service.ProjectService;
+import az.projectdailyreport.projectdailyreport.service.impl.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -21,12 +23,9 @@ import java.util.List;
 public class ProjectController {
 
     private final ProjectService projectService;
+    private final UserServiceImpl userService;
 
-    @GetMapping()
-    public List<ProjectGetDto> getAllProjects() {
-        return projectService.getAllProject();
-    }
-    @PostMapping
+     @PostMapping
     public ResponseEntity<ProjectResponse> createProject(@RequestBody ProjectRequest projectRequest) {
         ProjectResponse projectResponse = projectService.createProject(projectRequest);
         return ResponseEntity.ok(projectResponse);
@@ -42,10 +41,10 @@ public class ProjectController {
     @GetMapping("/search")
     public ResponseEntity<Page<ProjectFilterDto>> searchProjectsByName(
             @RequestParam(value = "name",required = false) String projectName,
-            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page-1, size);
         Page<ProjectFilterDto> filteredProjects = projectService.searchProjectsByName(projectName, pageable);
         if (filteredProjects.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -56,6 +55,12 @@ public class ProjectController {
     public ResponseEntity<ProjectFilterDto> getProjectById(@PathVariable Long projectId) {
         ProjectFilterDto project = projectService.getById(projectId);
             return ResponseEntity.ok(project);
+    }
+    @GetMapping("")
+    public List<ProjectGetDto> getProjectsByUserId() {
+      User user =  userService.getSignedInUser();
+
+        return projectService.getProjectsByUserId(user.getId());
     }
 
 }

@@ -17,7 +17,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -69,6 +71,29 @@ public class ProjectServiceImpl implements ProjectService {
                 })
                 .collect(Collectors.toList());
     }
+    @Override
+    public List<ProjectGetDto> getProjectsByUserId(Long userId) {
+
+        Optional<User> userOptional = userRepository.findById(userId);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+
+            List<Project> projects = user.getProjects();
+
+            return projects.stream()
+                    .map(project -> {
+                        ProjectGetDto projectGetDto = new ProjectGetDto();
+                        projectGetDto.setProjectName(project.getProjectName());
+                        projectGetDto.setId(project.getId());
+                        return projectGetDto;
+                    })
+                    .collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
 
     @Override
     public List<Project> getProjectByIds(List <Long> projectId) {

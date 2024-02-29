@@ -36,7 +36,7 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.POST,"/api/v1/auth/refresh-token").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD","EMPLOYEE")
                                 .requestMatchers(HttpMethod.POST,"/users/forget-password-otp").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/users/forget-password-email").permitAll()
-                                .requestMatchers(HttpMethod.POST,"/users/confirm-password").permitAll()
+                                .requestMatchers(HttpMethod.PUT,"/users/confirm-password").permitAll()
                                 .requestMatchers(HttpMethod.GET,"/users/profile").permitAll()
                                 .requestMatchers(HttpMethod.GET,"/users/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD")
                                 .requestMatchers(HttpMethod.POST,"/users/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN")
@@ -53,7 +53,7 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.GET,"/api/report/**").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD","EMPLOYEE")
                                 .requestMatchers(HttpMethod.POST,"/api/report/{reportId}/").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD","EMPLOYEE")
                                 .requestMatchers(HttpMethod.GET,"/api/report/{report_id}/").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD","EMPLOYEE")
-
+                                .requestMatchers(HttpMethod.GET,"/api/project").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD","EMPLOYEE")
                                 .requestMatchers(HttpMethod.GET,"/api/report/user/reports").hasAuthority("EMPLOYEE")
                                 .requestMatchers(HttpMethod.GET,"/api/report/admin/filtir").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD")
                                 .requestMatchers(HttpMethod.GET,"/api/report/export-excel").hasAnyAuthority("SUPER_ADMIN", "ADMIN","HEAD")

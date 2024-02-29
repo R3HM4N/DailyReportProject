@@ -319,8 +319,8 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserMailNotFoundExeption("User not found: "));
 
         if (isOtpValid(user.getResetTokenCreationTime())) {
-            LocalDateTime currentTime = LocalDateTime.now(); // Doğru şekilde güncellendi
-            LocalDateTime expirationTime = user.getResetTokenCreationTime().plusMinutes(5); // 5 dakika süre tanımla
+            LocalDateTime currentTime = LocalDateTime.now();
+            LocalDateTime expirationTime = user.getResetTokenCreationTime().plusMinutes(5);
 
             if (currentTime.isBefore(expirationTime)) {
                 user.setChange(true);

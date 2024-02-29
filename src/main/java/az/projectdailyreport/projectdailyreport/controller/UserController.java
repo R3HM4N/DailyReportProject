@@ -55,15 +55,13 @@ public class UserController {
             @RequestParam(required = false) Status status,
             @RequestParam(required = false) List<Long> teamId,
             @RequestParam(required = false) List<Long> projectIds,
-            @RequestParam(name = "pageNumber", defaultValue = "0") Integer page,
+            @RequestParam(name = "pageNumber", defaultValue = "1") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer size,
             @RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
             @RequestParam(name = "sortOrder", defaultValue = "ASC") String sortOrder) {
 
-        // Pageable oluşturma
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(sortOrder), sortBy);
+        Pageable pageable = PageRequest.of(page-1, size, Sort.Direction.fromString(sortOrder), sortBy);
 
-        // UserService'den sayfalama ile kullanıcıları alma
         Page<UserDTO> users = userService.getUsersByFilters(firstName, lastName, status, teamId, projectIds, pageable);
         return ResponseEntity.ok(users);
 
