@@ -11,7 +11,10 @@ import az.projectdailyreport.projectdailyreport.service.ProjectService;
 import az.projectdailyreport.projectdailyreport.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +27,7 @@ import java.util.stream.Collectors;
 
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ProjectServiceImpl implements ProjectService {
 
@@ -32,6 +36,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final UserService userService;
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
+    private static final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
 
 
@@ -52,6 +57,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         Project savedProject = projectRepository.save(project);
+        log.info("Project  created");
 
         return modelMapper.map(savedProject, ProjectResponse.class);
     }
@@ -142,6 +148,8 @@ public class ProjectServiceImpl implements ProjectService {
                 user.getProjects().add(existingProject);
             }
         }
+        log.info("project  updated");
+
         return projectRepository.save(existingProject);
     }
 

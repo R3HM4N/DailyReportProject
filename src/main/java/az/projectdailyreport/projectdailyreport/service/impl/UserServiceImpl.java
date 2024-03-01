@@ -12,13 +12,15 @@ import az.projectdailyreport.projectdailyreport.repository.UserRepository;
 import az.projectdailyreport.projectdailyreport.service.UserService;
 import az.projectdailyreport.projectdailyreport.unit.EmailService;
 import az.projectdailyreport.projectdailyreport.unit.UserMapper;
-import ch.qos.logback.core.joran.conditional.IfAction;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +35,8 @@ import java.util.stream.Collectors;
 
 
 @Service
+@Slf4j
+
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
@@ -44,10 +48,12 @@ public class UserServiceImpl implements UserService {
     private final EmailService emailService;
     private final TeamRepository teamRepository;
     private final RoleServiceImpl roleService;
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+
 
     @Override
     public List<UserGetAll> getAll() {
-        List<User> userGetAlls = userRepository.findAll();
+        List<User> userGetAlls = userRepository.findAllByStatusNot(Status.INACTIVE);
 
         List<UserGetAll> us = userGetAlls.stream().map(user -> {
             String fullName = user.getFirstName() + " " + user.getLastName();
@@ -111,11 +117,8 @@ public class UserServiceImpl implements UserService {
 
         }
 
-        var savedUser = userRepository.save(user);
-        var jwtToken = jwtService.createToken(user);
-        var refreshToken = jwtService.generateRefreshToken(user);
+        log.info("User created");
 
-        authenticationService.saveUserToken(savedUser, jwtToken);
         return userRepository.save(user);
 
 
@@ -164,7 +167,6 @@ public class UserServiceImpl implements UserService {
 
     }
 
-//sljsdkskdj
 
 
 
@@ -319,27 +321,21 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByResetToken(forgetDto.getOtp())
                 .orElseThrow(() -> new UserMailNotFoundExeption("User not found: "));
 
-        if (isOtpValid(user.getResetTokenCreationTime())) {
-            LocalDateTime currentTime = LocalDateTime.now();
-            LocalDateTime expirationTime = user.getResetTokenCreationTime().plusMinutes(5);
-
-            if (currentTime.isBefore(expirationTime)) {
-                user.setChange(true);
-                userRepository.save(user);
-            } else {
-                throw new InvalidOtpException("OTP has expired");
-            }
-        } else {
-            throw new InvalidOtpException("Invalid OTP");
+        if (!isOtpValid(user.getResetTokenCreationTime())) {
+            invalidateOtp(user);
+            throw new InvalidOtpException("OTP is Invalid  or expired");
         }
+
+        user.setChange(true);
+        userRepository.save(user);
     }
 
     private boolean isOtpValid(LocalDateTime creationTime) {
         if (creationTime == null) {
             return false;
         }
-        LocalDateTime currentTime = LocalDateTime.now(); // Doğru şekilde güncellendi
-        LocalDateTime expirationTime = creationTime.plusMinutes(5); // 5 dakika süre tanımla
+        LocalDateTime currentTime = LocalDateTime.now();
+        LocalDateTime expirationTime = creationTime.plusMinutes(1);
         return currentTime.isBefore(expirationTime);
     }
     @Override
@@ -358,6 +354,10 @@ public class UserServiceImpl implements UserService {
     }
 
 
+    private void invalidateOtp(User user) {
+        user.setResetToken(null);
+        user.setChange(false);
+        userRepository.save(user);}
 }
 
 

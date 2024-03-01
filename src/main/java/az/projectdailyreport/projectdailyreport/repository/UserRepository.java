@@ -23,6 +23,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByChangeIsTrue();
 
+    List<User> findAllByStatusNot(Status status);
 
 
 
@@ -61,7 +62,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "AND (:status IS NULL OR u.status = :status) " +
             "AND (:teamIds IS NULL OR u.team.id IN :teamIds) " +
             "AND (:projectIds IS NULL OR EXISTS (SELECT p FROM u.projects p WHERE p.id IN :projectIds)) " +
-            "AND (u.roleName = 'Employee' OR (u.roleName = 'Admin' AND u.id = :userId))")
+            "AND (u.roleName = 'EMPLOYEE' OR (u.roleName = 'ADMİN' AND u.id = :userId))")
     Page<User> findByFiltersForAdmin(String firstName, String lastName, Status status, List<Long> teamIds, List<Long> projectIds, @Param("userId") Long userId, Pageable pageable);
 
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.projects WHERE u.id = :userId")

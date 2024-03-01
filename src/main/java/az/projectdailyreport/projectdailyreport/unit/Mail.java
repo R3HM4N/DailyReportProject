@@ -13,8 +13,8 @@ public class Mail {
     @Bean
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost("smtp.gmail.com");  // E-posta sağlayıcınızın SMTP bilgilerini buraya ekleyin
-        mailSender.setPort(587);  // E-posta sağlayıcınızın SMTP port bilgisini buraya ekleyin
+        mailSender.setHost("smtp.gmail.com");
+        mailSender.setPort(587);
 
         mailSender.setUsername("eliyev.99.18@gmail.com");
         mailSender.setPassword("kkqthecytbndxehb");

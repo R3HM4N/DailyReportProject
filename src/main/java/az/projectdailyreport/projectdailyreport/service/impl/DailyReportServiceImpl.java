@@ -16,7 +16,10 @@ import az.projectdailyreport.projectdailyreport.repository.DailyReportRepository
 import az.projectdailyreport.projectdailyreport.service.DailyReportService;
 import az.projectdailyreport.projectdailyreport.service.ProjectService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,11 +33,14 @@ import java.util.stream.Collectors;
 
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class DailyReportServiceImpl implements DailyReportService {
 
 
     private final DailyReportRepository dailyReportRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(DailyReportServiceImpl.class);
 
 
     private final ProjectService projectService;
@@ -64,6 +70,7 @@ public class DailyReportServiceImpl implements DailyReportService {
 
         UserDTO userDTO = modelMapper.map(user, UserDTO.class);
         ProjectDTO projectDTO = modelMapper.map(project, ProjectDTO.class);
+        log.info("Report created");
 
         return   modelMapper.map(savedReport, DailyReportDTO.class);
     }
@@ -85,6 +92,8 @@ public class DailyReportServiceImpl implements DailyReportService {
 
         ModelMapper modelMapper =new ModelMapper();
         DailyReport updatedReport = dailyReportRepository.save(existingReport);
+
+        log.info("report updated");
 
         return modelMapper.map(updatedReport, DailyReportDTO.class);
     }

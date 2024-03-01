@@ -16,7 +16,10 @@ import az.projectdailyreport.projectdailyreport.repository.UserRepository;
 import az.projectdailyreport.projectdailyreport.service.TeamService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,12 +28,16 @@ import java.util.stream.Collectors;
 
 
 @Service
+@Slf4j
+
 @RequiredArgsConstructor
 public class TeamServiceImpl implements TeamService {
 
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private static final Logger logger = LoggerFactory.getLogger(TeamServiceImpl.class);
+
 
 
 
@@ -78,7 +85,10 @@ public class TeamServiceImpl implements TeamService {
         Team team = new Team();
         team.setTeamName(teamDto.getTeamName());
         team.setStatus(Status.ACTIVE);
+        log.info("Team created");
+
         return teamRepository.save(team);
+
     }
 
     @Override
@@ -104,6 +114,8 @@ public class TeamServiceImpl implements TeamService {
 
         TeamResponse updatedTeamResponse = new TeamResponse();
         updatedTeamResponse.setTeamName(existingTeam.getTeamName());
+        log.info("Team updated");
+
         return updatedTeamResponse;
     }
 
@@ -118,6 +130,8 @@ public class TeamServiceImpl implements TeamService {
         } else {
             throw new TeamNotEmptyException(teamId);
         }
+        log.info("Team deleted");
+
     }
 
 }
