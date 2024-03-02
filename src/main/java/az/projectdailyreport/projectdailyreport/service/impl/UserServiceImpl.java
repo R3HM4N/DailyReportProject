@@ -159,13 +159,10 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(userDTOList, pageable, usersPage.getTotalElements());}
         
             Page<User> userPage1 =userRepository.findByFiltersForAdmin(firstName, lastName, status, teamId, projectIds,signeduser.getId(), pageable);
-            List<UserDTO> userDTOList = (userPage1.getContent()
+            List<UserDTO> userDTOList = userPage1.getContent()
                     .stream()
                     .map(UserMapper::toDTO)
-            .toList(),
-                    userPage1.getTotalPages(),
-        userPage1.getTotalElements(),
-        userPage1.hasNext());
+            .toList();
         return new PageImpl<>(userDTOList,pageable,userPage1.getTotalElements());
 
     }
