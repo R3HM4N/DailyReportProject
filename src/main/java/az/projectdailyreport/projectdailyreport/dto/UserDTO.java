@@ -21,6 +21,9 @@ public class UserDTO {
     private String mail;
     private TeamDTO team;
     private List<ProjectDTO> projects;
+    private int totalPages;
+    private long TotalElements;
+   private boolean hasNext;
 
 //    public void setProjects(List<ProjectDTO> projects) {
 //        this.projects = projects;

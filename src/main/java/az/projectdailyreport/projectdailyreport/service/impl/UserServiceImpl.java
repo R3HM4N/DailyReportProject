@@ -159,10 +159,13 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(userDTOList, pageable, usersPage.getTotalElements());}
         
             Page<User> userPage1 =userRepository.findByFiltersForAdmin(firstName, lastName, status, teamId, projectIds,signeduser.getId(), pageable);
-            List<UserDTO> userDTOList = userPage1.getContent()
+            List<UserDTO> userDTOList = (userPage1.getContent()
                     .stream()
                     .map(UserMapper::toDTO)
-            .toList();
+            .toList(),
+                    userPage1.getTotalPages(),
+        userPage1.getTotalElements(),
+        userPage1.hasNext());
         return new PageImpl<>(userDTOList,pageable,userPage1.getTotalElements());
 
     }
@@ -339,8 +342,8 @@ public class UserServiceImpl implements UserService {
         return currentTime.isBefore(expirationTime);
     }
     @Override
-    public void confirmPassword(ConfirmPassword confirmPassword) {
-        User user = userRepository.findByChangeIsTrue().orElseThrow(() -> new InvalidOtpException("expired OTP"));
+    public void confirmPassword(String mail, ConfirmPassword confirmPassword) {
+        User user = userRepository.findByEmail(mail).orElseThrow(() -> new InvalidOtpException("expired OTP"));
         if (confirmPassword.getNewPassword().equals(confirmPassword.getConfirmNewPassword())) {
             String encryptedPassword = passwordEncoder.encode(confirmPassword.getNewPassword());
             user.setPassword(encryptedPassword);

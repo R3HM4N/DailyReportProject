@@ -116,8 +116,8 @@ public class UserController {
         return new ResponseEntity<>("Otp code correct", HttpStatus.OK);
     }
     @PutMapping("/confirm-password")
-    public void confirmPassword(@RequestBody ConfirmPassword confirmPassword) {
-        userService.confirmPassword(confirmPassword);
+    public void confirmPassword(@RequestParam String mail ,@RequestBody ConfirmPassword confirmPassword) {
+        userService.confirmPassword(mail,confirmPassword);
     }
     @GetMapping("/profile")
     public ResponseEntity<UserGetDTO> getLoginUserById() {

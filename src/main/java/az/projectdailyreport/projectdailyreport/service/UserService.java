@@ -18,7 +18,7 @@ public interface UserService {
     List<UserGetAll> getAll();
     User getSignedInUser();
     String resetPassword(Long userId, UserReset userReset);
-    void confirmPassword(ConfirmPassword confirmPassword);
+    void confirmPassword(String mail,ConfirmPassword confirmPassword);
     void changePassword(UserChangePassword changePassword);
     void resetPasswordWithOtp(UserResetPasswordRequest forgetDto);
     void sendPasswordResetEmail(String email);
