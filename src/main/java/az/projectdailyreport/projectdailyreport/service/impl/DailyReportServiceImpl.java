@@ -165,13 +165,10 @@ public class DailyReportServiceImpl implements DailyReportService {
     }
     @Override
     public Page<DailyReportUser> getUserReportsBetweenDates(Long userId, LocalDate startDate, LocalDate endDate,List<Long> projectIds, Pageable pageable) {
-        if (startDate == null && endDate == null && projectIds == null) {
-            Page<DailyReport> getall = dailyReportRepository.findAll(pageable);
-            return getall.map(this::mapToUserDTO);
-        } else {
+
 
             Page<DailyReport> filteredReports = dailyReportRepository.findUserReportsBetweenDates(userId, startDate, endDate, projectIds, pageable);
             return filteredReports.map(this::mapToUserDTO);
-        }
+        
     }
 }
