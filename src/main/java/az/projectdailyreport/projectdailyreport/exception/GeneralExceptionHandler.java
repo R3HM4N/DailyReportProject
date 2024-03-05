@@ -1,10 +1,12 @@
 package az.projectdailyreport.projectdailyreport.exception;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 
 import static org.springframework.http.HttpStatus.*;
@@ -241,6 +243,17 @@ public class GeneralExceptionHandler {
                 BAD_REQUEST.value(),
                 BAD_REQUEST,
                 exception.getMessage());
+        return new ResponseEntity<>(response, BAD_REQUEST);
+
+
+    }
+    @ExceptionHandler(Exception.class)
+    public  ResponseEntity<ExceptionResponse> handleException (Exception  exception){
+        ExceptionResponse response = new ExceptionResponse(
+                LocalDateTime.now(),
+                BAD_REQUEST.value(),
+                BAD_REQUEST,
+                "Mail already exist another user .");
         return new ResponseEntity<>(response, BAD_REQUEST);
 
 

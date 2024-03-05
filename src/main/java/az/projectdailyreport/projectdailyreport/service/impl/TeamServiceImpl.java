@@ -4,10 +4,7 @@ import az.projectdailyreport.projectdailyreport.dto.RoleDTO;
 import az.projectdailyreport.projectdailyreport.dto.TeamResponse;
 import az.projectdailyreport.projectdailyreport.dto.team.TeamGetByIdDto;
 import az.projectdailyreport.projectdailyreport.dto.team.TeamUserDto;
-import az.projectdailyreport.projectdailyreport.exception.TeamExistsException;
-import az.projectdailyreport.projectdailyreport.exception.TeamNotEmptyException;
-import az.projectdailyreport.projectdailyreport.exception.TeamNotFoundException;
-import az.projectdailyreport.projectdailyreport.exception.UserNotFoundException;
+import az.projectdailyreport.projectdailyreport.exception.*;
 import az.projectdailyreport.projectdailyreport.model.Status;
 import az.projectdailyreport.projectdailyreport.model.Team;
 import az.projectdailyreport.projectdailyreport.model.User;
@@ -96,6 +93,10 @@ public class TeamServiceImpl implements TeamService {
     public TeamResponse updateTeamAndUsers(Long teamId, TeamResponse newTeamName, List<Long> newUserIds) {
         Team existingTeam = teamRepository.findById(teamId)
                 .orElseThrow(() -> new TeamNotFoundException(teamId));
+        Optional<Team> teamWithSameName = teamRepository.findByTeamNameIgnoreCase(newTeamName.getTeamName());
+        if (teamWithSameName.isPresent() && !teamWithSameName.get().getId().equals(teamId)) {
+            throw new MailAlreadyExistsException("Team already exists, please choose another name.");
+        }
         existingTeam.setTeamName(newTeamName.getTeamName());
         if (newUserIds!=null){
         for (User user : existingTeam.getUsers()) {

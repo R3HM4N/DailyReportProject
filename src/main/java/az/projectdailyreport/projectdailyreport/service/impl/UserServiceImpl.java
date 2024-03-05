@@ -208,7 +208,7 @@ public class UserServiceImpl implements UserService {
 
 
         if (userOptional.isPresent()) {
-            Optional<Team> team = teamRepository.findById(updatedUserDTO.getTeamId());
+
             Optional<Role> role = roleService.findRoleById(updatedUserDTO.getRoleId());
 
             User updatedUser = userOptional.get();
@@ -216,12 +216,16 @@ public class UserServiceImpl implements UserService {
             updatedUser.setLastName(updatedUserDTO.getLastName());
 
             updatedUser.setMail(updatedUserDTO.getEmail());
-            boolean isMailExists = userRepository.existsByMail(updatedUserDTO.getEmail());
-            if (isMailExists &&  !updatedUserDTO.getEmail().equals(userOptional.get().getMail())) {
+            if (!updatedUserDTO.getEmail().equals(userOptional.get().getMail())) {
                 throw new MailAlreadyExistsException("Email address already exists");
             }
             updatedUser.setRole(role.get());
-            updatedUser.setTeam(team.get());
+            if (updatedUserDTO.getTeamId() != null) {
+
+                Team team = teamRepository.findById(updatedUserDTO.getTeamId())
+                        .orElseThrow(() -> new TeamNotFoundException(updatedUserDTO.getTeamId()));
+
+                updatedUser.setTeam(team);}
             if (user1.getRoleName().equals(RoleName.ADMIN) && (updatedUserDTO.getRoleId() == 2 || updatedUserDTO.getRoleId() == 1)) {
                 throw new RoleException("Yoou don't have access to create Admin and SuperAdmin.");
             }

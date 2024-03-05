@@ -3,6 +3,7 @@ package az.projectdailyreport.projectdailyreport.repository;
 import az.projectdailyreport.projectdailyreport.model.Deleted;
 import az.projectdailyreport.projectdailyreport.model.Project;
 import az.projectdailyreport.projectdailyreport.model.Status;
+import az.projectdailyreport.projectdailyreport.model.Team;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,6 +24,8 @@ public interface ProjectRepository extends JpaRepository<Project,Long> {
     @Query("SELECT p FROM Project p WHERE LOWER(p.projectName) LIKE LOWER(CONCAT('%', :projectName, '%'))")
     Page<Project> findByProjectNameContaining(@Param("projectName") String projectName, Pageable pageable);
 
+
+    Optional<Project> findByProjectNameIgnoreCase(String projectName);
 
     @Modifying
     @Query("UPDATE Project p SET p.status = 'DELETED' WHERE p.id = :id")
