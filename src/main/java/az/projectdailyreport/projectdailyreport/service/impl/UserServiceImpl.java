@@ -53,19 +53,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserGetAll> getAll() {
-        List<User> userGetAlls = userRepository.findAllByStatusNot(Status.INACTIVE);
+        List<User> employees = userRepository.findAllByStatusNotAndRoleName(Status.INACTIVE, RoleName.EMPLOYEE);
 
-        List<UserGetAll> us = userGetAlls.stream().map(user -> {
+        List<UserGetAll> employeeDTOs = employees.stream().map(user -> {
             String fullName = user.getFirstName() + " " + user.getLastName();
 
-            UserGetAll userGetAll = UserGetAll.builder().id(user.getId())
+            UserGetAll userDTO = UserGetAll.builder()
+                    .id(user.getId())
                     .fullName(fullName)
-                    .mail(user.getMail()).build();
-            return userGetAll;
+                    .mail(user.getMail())
+                    .build();
 
+            return userDTO;
         }).collect(Collectors.toList());
-        return us;
+
+        return employeeDTOs;
     }
+
 
     public User getSignedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -210,7 +214,12 @@ public class UserServiceImpl implements UserService {
             User updatedUser = userOptional.get();
             updatedUser.setFirstName(updatedUserDTO.getFirstName());
             updatedUser.setLastName(updatedUserDTO.getLastName());
+
             updatedUser.setMail(updatedUserDTO.getEmail());
+            boolean isMailExists = userRepository.existsByMail(updatedUserDTO.getEmail());
+            if (isMailExists &&  !updatedUserDTO.getEmail().equals(userOptional.get().getMail())) {
+                throw new MailAlreadyExistsException("Email address already exists");
+            }
             updatedUser.setRole(role.get());
             updatedUser.setTeam(team.get());
             if (user1.getRoleName().equals(RoleName.ADMIN) && (updatedUserDTO.getRoleId() == 2 || updatedUserDTO.getRoleId() == 1)) {
@@ -274,7 +283,7 @@ public class UserServiceImpl implements UserService {
     public void changePassword(UserChangePassword changePassword) {
         User user = getSignedInUser();
 
-        if (passwordEncoder.matches(changePassword.getOldpassword(), user.getPassword()) && changePassword.getNewPassword().equals(changePassword.getNewConfirimPassword())) {
+        if (passwordEncoder.matches(changePassword.getOldpassword(), user.getPassword()) && changePassword.getNewPassword().equals(changePassword.getNewConfirmPassword())) {
             String encryptedPassword = passwordEncoder.encode(changePassword.getNewPassword());
             user.setPassword(encryptedPassword);
             userRepository.save(user);
@@ -326,7 +335,6 @@ public class UserServiceImpl implements UserService {
             throw new InvalidOtpException("OTP is Invalid  or expired");
         }
 
-        user.setChange(true);
         userRepository.save(user);
     }
 
@@ -345,7 +353,6 @@ public class UserServiceImpl implements UserService {
             String encryptedPassword = passwordEncoder.encode(confirmPassword.getNewPassword());
             user.setPassword(encryptedPassword);
             user.setResetToken(null);
-            user.setChange(false);
             userRepository.save(user);
         } else {
             throw new PasswordsNotMatchException("New password and confirm password do not match");
@@ -356,7 +363,6 @@ public class UserServiceImpl implements UserService {
 
     private void invalidateOtp(User user) {
         user.setResetToken(null);
-        user.setChange(false);
         userRepository.save(user);}
 }
 

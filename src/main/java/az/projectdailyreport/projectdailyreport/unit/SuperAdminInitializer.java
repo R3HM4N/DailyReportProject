@@ -39,10 +39,10 @@ public class SuperAdminInitializer implements CommandLineRunner {
         }
         if (!userRepository.existsByRole(roleRepository.findById(3L).get())){
             User head = User.builder()
-                    .firstName("boyuk")
-                    .lastName("boyuk")
+                    .firstName("HEAD")
+                    .lastName("HEAD")
                     .mail("head@crocusoft.com")
-                    .password(passwordEncoder.encode("BoyukHead"))
+                    .password(passwordEncoder.encode("HEAD123!"))
                     .status(Status.ACTIVE)
                     .role(roleRepository.findById(3L).get())
                     .roleName(RoleName.HEAD)
@@ -57,7 +57,7 @@ public class SuperAdminInitializer implements CommandLineRunner {
         if (!userRepository.existsByRole(roleRepository.findById(1L).get())) {
             User superAdmin =User.builder()
                     .mail("superadmin@crocusoft.com")
-                    .firstName("Rehman")
+                    .firstName("SuperAdmin")
                     .lastName("SuperAdmin")
                     .password(passwordEncoder.encode("superadminpassword"))
                     .status(Status.ACTIVE)

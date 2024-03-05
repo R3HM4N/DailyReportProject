@@ -37,11 +37,9 @@ public class User implements UserDetails {
     @Builder.Default
     private boolean deleted = false;
 
-    @Builder.Default
-    @Column(name = "is_change", nullable = false)
-    private boolean change = false;
 
-//    @CrocusoftEmail
+
+    @CrocusoftEmail
     @Builder.Default
     @Email(message = "Geçerli bir e-posta adresi değil")
     private String mail = null;

@@ -169,6 +169,6 @@ public class DailyReportServiceImpl implements DailyReportService {
 
             Page<DailyReport> filteredReports = dailyReportRepository.findUserReportsBetweenDates(userId, startDate, endDate, projectIds, pageable);
             return filteredReports.map(this::mapToUserDTO);
-        
+
     }
 }

@@ -21,9 +21,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByRole(Role role);
    Optional< User>  findByResetToken(String resetToken);
 
-    Optional<User> findByChangeIsTrue();
 
-    List<User> findAllByStatusNot(Status status);
+    List<User> findAllByStatusNotAndRoleName(Status status, RoleName role);
 
 
 
