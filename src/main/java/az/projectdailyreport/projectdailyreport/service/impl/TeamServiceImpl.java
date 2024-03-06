@@ -53,6 +53,7 @@ public class TeamServiceImpl implements TeamService {
                     .id(x.getId())
                     .firstName(x.getFirstName())
                     .lastName(x.getLastName())
+                    .status(x.getStatus())
                     .role(RoleDTO.builder()
                             .id(x.getRole().getId())
                             .roleName(x.getRole().getRoleName())

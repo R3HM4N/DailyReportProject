@@ -1,6 +1,7 @@
 package az.projectdailyreport.projectdailyreport.dto.team;
 
 import az.projectdailyreport.projectdailyreport.dto.RoleDTO;
+import az.projectdailyreport.projectdailyreport.model.Status;
 import lombok.*;
 
 @Data
@@ -12,5 +13,6 @@ public class TeamUserDto {
     private String firstName;
     private String lastName;
     private String email;
+    private Status status;
     private RoleDTO role;
 }
