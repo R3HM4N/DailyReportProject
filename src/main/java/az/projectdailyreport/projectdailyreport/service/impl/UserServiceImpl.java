@@ -90,20 +90,26 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(createUserRequest.getPassword()));
         user.setRole(createUserRequest.getRole());
         user.setStatus(Status.ACTIVE);
+        if (createUserRequest.getRole().getId()==1 ||createUserRequest.getRole().getId()==3){
+            throw new RoleException("You don't have access to create Head and SuperAdmin.");
 
+
+        }
         if (user1.getRoleName().equals(RoleName.ADMIN) && (createUserRequest.getRole().getId() == 2 || createUserRequest.getRole().getId() == 1)) {
-            throw new RoleException("Yoou don't have access to create Admin and SuperAdmin.");
+            throw new RoleException("You don't have access to create Admin and SuperAdmin.");
         }
         if (user1.getRoleName().equals(RoleName.SUPER_ADMIN)) {
             if (createUserRequest.getRole().getId() == 2) {
                 user.setRoleName(RoleName.ADMIN);
-            }  else if (createUserRequest.getRole().getId() == 4) {
+            }
+            else if (createUserRequest.getRole().getId() == 4) {
                 user.setRoleName(RoleName.EMPLOYEE);
             }
         } else if (user1.getRoleName().equals(RoleName.ADMIN)) {
             if  (createUserRequest.getRole().getId() == 4) {
                 user.setRoleName(RoleName.EMPLOYEE);
             }
+
         }
 
         user.setMail(createUserRequest.getMail());

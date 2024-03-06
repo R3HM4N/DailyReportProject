@@ -248,7 +248,7 @@ public class GeneralExceptionHandler {
 
     }
     @ExceptionHandler(Exception.class)
-    public  ResponseEntity<ExceptionResponse> handleException (Exception  exception){
+    public  ResponseEntity<ExceptionResponse> handleException (Exception mailAlreadyExistsException){
         ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
                 BAD_REQUEST.value(),

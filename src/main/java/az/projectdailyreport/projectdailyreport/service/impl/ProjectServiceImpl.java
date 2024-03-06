@@ -136,7 +136,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         Optional<Project> projectWithSameName =projectRepository.findByProjectNameIgnoreCase(newProjectName.getProjectName());
         if (projectWithSameName.isPresent() && !projectWithSameName.get().getId().equals(projectId)){
-            throw new MailAlreadyExistsException("Project already exists, please choose another name.");
+            throw new ProjectExistsException("Project already exists, please choose another name.");
 
         }
         existingProject.setProjectName(newProjectName.getProjectName());

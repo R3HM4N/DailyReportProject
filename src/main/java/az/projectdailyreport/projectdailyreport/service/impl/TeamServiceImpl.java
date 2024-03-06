@@ -95,7 +95,7 @@ public class TeamServiceImpl implements TeamService {
                 .orElseThrow(() -> new TeamNotFoundException(teamId));
         Optional<Team> teamWithSameName = teamRepository.findByTeamNameIgnoreCase(newTeamName.getTeamName());
         if (teamWithSameName.isPresent() && !teamWithSameName.get().getId().equals(teamId)) {
-            throw new MailAlreadyExistsException("Team already exists, please choose another name.");
+            throw new TeamExistsException("Team already exists, please choose another name.");
         }
         existingTeam.setTeamName(newTeamName.getTeamName());
         if (newUserIds!=null){
