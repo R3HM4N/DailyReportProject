@@ -2,6 +2,7 @@ package az.projectdailyreport.projectdailyreport.service.impl;
 
 import az.projectdailyreport.projectdailyreport.dto.request.AuthenticationRequest;
 import az.projectdailyreport.projectdailyreport.dto.request.AuthenticationResponse;
+import az.projectdailyreport.projectdailyreport.dto.request.RefreshToken;
 import az.projectdailyreport.projectdailyreport.exception.EmailNotSentException;
 import az.projectdailyreport.projectdailyreport.exception.MailAlreadyExistsException;
 import az.projectdailyreport.projectdailyreport.exception.UserNotFoundException;
@@ -111,7 +112,7 @@ public class AuthenticationService {
                 new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
         }
-    }public String generateAccessToken(String refreshToken,HttpServletRequest request, HttpServletResponse response) {
+    }public AuthenticationResponse generateAccessToken(String refreshToken,HttpServletRequest request, HttpServletResponse response) throws IOException {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         final String mail;
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -127,7 +128,11 @@ public class AuthenticationService {
                 var accessToken = jwtService.createToken(user);
                 revokeAllUserTokens(user);
                 saveUserToken(user, accessToken);
-                return accessToken;
+                var authResponse = AuthenticationResponse.builder()
+                        .accessToken(accessToken)
+                        .build();
+                new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
+
             }}
                 return null;}
     }

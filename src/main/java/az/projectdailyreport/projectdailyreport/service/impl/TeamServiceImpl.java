@@ -111,7 +111,11 @@ public class TeamServiceImpl implements TeamService {
             user.setTeam(existingTeam);
             existingTeam.getUsers().add(user);
         }}
-
+        if (newUserIds==null){
+            for (User user : existingTeam.getUsers()) {
+                user.setTeam(null);
+            }
+        }
         existingTeam = teamRepository.save(existingTeam);
 
         TeamResponse updatedTeamResponse = new TeamResponse();
@@ -130,7 +134,7 @@ public class TeamServiceImpl implements TeamService {
         if (team.canBeDeleted()) {
             teamRepository.delete(team);
         } else {
-            throw new TeamNotEmptyException(teamId);
+            throw new MailAlreadyExistsException("Team  cannot be deleted as it contains users.");
         }
         log.info("Team deleted");
 

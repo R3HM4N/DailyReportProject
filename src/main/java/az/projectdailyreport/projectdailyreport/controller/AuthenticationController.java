@@ -25,7 +25,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(service.authenticate(request));
     }
     @PostMapping("/refresh-token")
-    public  ResponseEntity<String> refresh(@RequestBody RefreshToken refreshToken,HttpServletRequest request, HttpServletResponse response){
+    public  ResponseEntity<AuthenticationResponse> refresh(@RequestBody RefreshToken refreshToken,HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         return ResponseEntity.ok(service.generateAccessToken(refreshToken.getRefreshToken(),request,response))   ;
     }

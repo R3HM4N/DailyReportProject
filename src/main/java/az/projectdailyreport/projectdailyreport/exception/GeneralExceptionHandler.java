@@ -248,12 +248,12 @@ public class GeneralExceptionHandler {
 
     }
     @ExceptionHandler(Exception.class)
-    public  ResponseEntity<ExceptionResponse> handleException (Exception mailAlreadyExistsException){
+    public  ResponseEntity<ExceptionResponse> handleException (Exception exception){
         ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
                 BAD_REQUEST.value(),
                 BAD_REQUEST,
-                "Mail already exist another user .");
+                exception.getMessage());
         return new ResponseEntity<>(response, BAD_REQUEST);
 
 

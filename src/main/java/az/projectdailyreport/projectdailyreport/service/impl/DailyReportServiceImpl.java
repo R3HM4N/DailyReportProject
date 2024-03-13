@@ -24,6 +24,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -47,6 +52,15 @@ public class DailyReportServiceImpl implements DailyReportService {
     LocalDateTime startOfDay = LocalDateTime.now().with(LocalTime.MIN);
     LocalDateTime endOfDay = LocalDateTime.now().with(LocalTime.MAX);
 
+    private String parseHtmlAndExtractText(String html) {
+        Document doc = Jsoup.parse(html);
+        Elements paragraphs = doc.select("p");
+        StringBuilder textBuilder = new StringBuilder();
+        for (Element paragraph : paragraphs) {
+            textBuilder.append(paragraph.text());
+        }
+        return textBuilder.toString();
+    }
 
     @Override
     public DailyReportDTO createDailyReport(DailyReportRequest dailyReportRequest, User user) {
@@ -127,7 +141,7 @@ public class DailyReportServiceImpl implements DailyReportService {
                 .id(dailyReport.getId())
                 .userId(dailyReport.getUser().getId())
                 .localDateTime(dailyReport.getLocalDateTime())
-                .reportText(dailyReport.getReportText())
+                .reportText(parseHtmlAndExtractText(dailyReport.getReportText()))
                 .project(mapProjectToDTO(dailyReport.getProject()))
                 .build();
     }
@@ -139,7 +153,7 @@ public class DailyReportServiceImpl implements DailyReportService {
                 .firstName(dailyReport.getFirstName())
                 .lastName(dailyReport.getLastName())
                 .localDateTime(dailyReport.getLocalDateTime())
-                .reportText(dailyReport.getReportText())
+                .reportText(parseHtmlAndExtractText(dailyReport.getReportText()))
                 .project(mapProjectToDTO(dailyReport.getProject()))
                 .build();
     }

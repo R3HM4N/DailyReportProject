@@ -12,6 +12,10 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import jakarta.servlet.ServletOutputStream;
 
@@ -24,6 +28,16 @@ import java.util.List;
 public class ExcelExportService {
 
     private final DailyReportRepository dailyReportRepository;
+
+    private String parseHtmlAndExtractText(String html) {
+        Document doc = Jsoup.parse(html);
+        Elements paragraphs = doc.select("p");
+        StringBuilder textBuilder = new StringBuilder();
+        for (Element paragraph : paragraphs) {
+            textBuilder.append(paragraph.text());
+        }
+        return textBuilder.toString();
+    }
 
     public void generateDailyReportExcel(
             HttpServletResponse httpServletResponse,
@@ -60,7 +74,7 @@ public class ExcelExportService {
             dataRow.createCell(2).setCellValue(report.getFirstName());
             dataRow.createCell(3).setCellValue(report.getLastName());
             dataRow.createCell(4).setCellValue(report.getLocalDateTime());
-            dataRow.createCell(5).setCellValue(report.getReportText());
+            dataRow.createCell(5).setCellValue(parseHtmlAndExtractText(report.getReportText()));
             dataRow.createCell(6).setCellValue(report.getProject().getProjectName());
 
             dataRowIndex++;
