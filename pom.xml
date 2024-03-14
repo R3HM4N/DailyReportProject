@@ -151,7 +151,7 @@
         <repository>
             <id>DailyRepostProject</id>
             <name>DailyRepostProject</name>
-            <url>https://github.com/R3HM4N/DailyRepostProject.git</url>
+            <url>https://github.com/R3HM4N/DailyReportProject.git</url>
         </repository>
     </distributionManagement>
 
