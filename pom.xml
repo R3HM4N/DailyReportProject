@@ -143,8 +143,10 @@
                     <source>1.8</source>
                     <target>1.8</target>
                     <compilerArgs>
-                        <arg>--release</arg>
-                        <arg>17</arg> 
+                        <arg>-source</arg>
+                        <arg>1.8</arg>
+                        <arg>-target</arg>
+                        <arg>1.8</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>
